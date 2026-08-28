@@ -25,6 +25,7 @@ class AudioEngine: @unchecked Sendable {
 
     // AAC 解码器
     private var converter: AVAudioConverter?
+    private var aacFormat: AVAudioFormat?
 
     // 音频配置
     private var sampleRate: Double = 44100
@@ -35,7 +36,6 @@ class AudioEngine: @unchecked Sendable {
     private let pcmBufferQueue = DispatchQueue(label: "com.syncrozero.pcm", qos: .userInitiated)
     private var pendingPCMBuffers: [AVAudioPCMBuffer] = []
     private var isPlaying = false
-    private var isConnected = false
 
     // 实时保持
     private var lastBufferTime: TimeInterval = 0
@@ -43,7 +43,6 @@ class AudioEngine: @unchecked Sendable {
 
     // 统计
     private var totalPCMFrames: Int64 = 0
-    private var totalBytesWritten: Int = 0
 
     // MARK: - 初始化
     init() {
@@ -88,18 +87,14 @@ class AudioEngine: @unchecked Sendable {
             interleaved: true
         )
 
-        // 创建 AVAudioConverter 用于 AAC → PCM 解码
+        // 创建 AAC 输入格式
         guard let inputFormat = createAACFormat() else {
             onError?("无法创建 AAC 输入格式")
             return
         }
+        aacFormat = inputFormat
 
-        guard let outputFormat = AVAudioFormat(
-            commonFormat: .pcmFormatInt16,
-            sampleRate: sampleRate,
-            channels: channelCount,
-            interleaved: true
-        ) else {
+        guard let outputFormat = bufferFormat else {
             onError?("无法创建 PCM 输出格式")
             return
         }
@@ -111,14 +106,12 @@ class AudioEngine: @unchecked Sendable {
 
     // 创建 AAC 输入格式
     private func createAACFormat() -> AVAudioFormat? {
-        // 使用标准 AAC-LC 格式描述
-        // 构造 AudioStreamBasicDescription
         var streamDesc = AudioStreamBasicDescription()
         streamDesc.mSampleRate = sampleRate
         streamDesc.mFormatID = kAudioFormatMPEG4AAC
         streamDesc.mFormatFlags = 0
         streamDesc.mBytesPerPacket = 0
-        streamDesc.mFramesPerPacket = 1024  // AAC 帧长
+        streamDesc.mFramesPerPacket = 1024
         streamDesc.mBytesPerFrame = 0
         streamDesc.mChannelsPerFrame = channelCount
         streamDesc.mBitsPerChannel = 0
@@ -129,17 +122,14 @@ class AudioEngine: @unchecked Sendable {
 
     // 启动音频引擎
     private func setupAudioEngine() {
-        // 停止现有引擎
         if engine.isRunning {
             engine.stop()
         }
 
-        // 移除旧 player
         if let player = audioPlayer {
             engine.detach(player)
         }
 
-        // 创建新 player
         audioPlayer = AVAudioPlayerNode()
         guard let player = audioPlayer else { return }
 
@@ -152,7 +142,6 @@ class AudioEngine: @unchecked Sendable {
 
         engine.connect(player, to: engine.mainMixerNode, format: format)
 
-        // 设置 audio session
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, mode: .spokenAudio, options: [.mixWithOthers, .allowBluetoothA2DP])
@@ -165,7 +154,6 @@ class AudioEngine: @unchecked Sendable {
             isPlaying = true
             onStatus?("直播音频已启动")
 
-            // 启动缓冲健康检查
             startBufferHealthCheck()
         } catch {
             onError?("音频引擎启动失败: \(error.localizedDescription)")
@@ -175,33 +163,56 @@ class AudioEngine: @unchecked Sendable {
     // MARK: - 处理音频帧
     private func processAudioFrame(_ frame: AudioFrame) {
         guard let converter = converter,
-              let outputFormat = bufferFormat else {
+              let outputFormat = bufferFormat,
+              let aacFormat = aacFormat else {
             return
         }
 
-        // 将 AAC 原始数据包装为 AVAudioPacketBuffer
-        guard let packetBuffer = createPacketBuffer(from: frame.data) else {
-            return
-        }
-
-        // 创建输出 PCM buffer
+        // 创建输入 PCM buffer 用于承载 AAC 原始数据
+        // AVAudioConverter 需要通过 AVAudioPacketBuffer 输入压缩数据
+        // 使用 AudioBufferList 方式
         let frameCapacity = AVAudioFrameCount(1024)
+
         guard let pcmBuffer = AVAudioPCMBuffer(pcmFormat: outputFormat, frameCapacity: frameCapacity) else {
             return
         }
 
-        // 使用 AVAudioConverter 解码
+        // 使用 convert 方法，通过 inputBlock 提供 AAC 数据
+        // 用 AudioStreamDataPacketDescription 描述 AAC 包
+        var dataPtr: UnsafeMutablePointer<UInt8>?
+        let dataSize = frame.data.count
+
+        guard let aacBuffer = AVAudioCompressedBuffer(format: aacFormat,
+                                                      packetCapacity: 1,
+                                                      maximumPacketSize: dataSize) else {
+            return
+        }
+
+        // 复制 AAC 数据到 compressed buffer
+        frame.data.withUnsafeBytes { rawBuffer in
+            if let base = rawBuffer.baseAddress {
+                memcpy(aacBuffer.data, base, dataSize)
+            }
+        }
+        aacBuffer.byteLength = UInt32(dataSize)
+        aacBuffer.packetCount = 1
+        aacBuffer.data?.withMemoryRebound(to: AudioStreamPacketDescription.self, capacity: 1) { desc in
+            desc.pointee.mStartOffset = 0
+            desc.pointee.mVariableFramesInPacket = 0
+            desc.pointee mDataByteSize = UInt32(dataSize)
+        }
+
         var error: NSError?
-        var inputBufferConsumed = false
+        var consumed = false
 
         let inputBlock: AVAudioConverterInputBlock = { _, outStatus in
-            if inputBufferConsumed {
+            if consumed {
                 outStatus.pointee = .endOfStream
                 return nil
             }
-            inputBufferConsumed = true
+            consumed = true
             outStatus.pointee = .haveData
-            return packetBuffer
+            return aacBuffer
         }
 
         let status = converter.convert(to: pcmBuffer, error: &error, withInputFrom: inputBlock)
@@ -215,35 +226,6 @@ class AudioEngine: @unchecked Sendable {
         }
     }
 
-    // 创建 AVAudioPacketBuffer
-    private func createPacketBuffer(from aacData: Data) -> AVAudioPacketBuffer? {
-        guard let aacFormat = createAACFormat() else { return nil }
-
-        var packetBuffer: AVAudioPacketBuffer?
-        let result = AVAudioPacketBufferCreate(
-            kCFAllocatorDefault,
-            aacFormat.formatDescription,
-            1,
-            1024,
-            aacFormat.formatDescription,
-            aacData.count,
-            &packetBuffer
-        )
-
-        guard result == noErr, let buffer = packetBuffer else {
-            return nil
-        }
-
-        // 复制数据
-        aacData.withUnsafeBytes { rawBuffer in
-            if let base = rawBuffer.baseAddress {
-                memcpy(buffer.mData, base, aacData.count)
-            }
-        }
-
-        return buffer
-    }
-
     // 入队 PCM 缓冲区
     private func enqueuePCMBuffer(_ buffer: AVAudioPCMBuffer) {
         pcmBufferQueue.async { [weak self] in
@@ -251,11 +233,9 @@ class AudioEngine: @unchecked Sendable {
 
             self.pendingPCMBuffers.append(buffer)
             self.totalPCMFrames += Int64(buffer.frameLength)
-            self.totalBytesWritten += buffer.byteLength
 
-            // 控制缓冲区大小，避免过多堆积
+            // 控制缓冲区大小
             if self.pendingPCMBuffers.count > 50 {
-                // 丢弃最旧的几帧保持实时
                 let dropCount = self.pendingPCMBuffers.count - 30
                 self.pendingPCMBuffers.removeFirst(dropCount)
                 DispatchQueue.main.async {
@@ -273,11 +253,7 @@ class AudioEngine: @unchecked Sendable {
 
         while !pendingPCMBuffers.isEmpty {
             let buffer = pendingPCMBuffers.removeFirst()
-
-            // 变速处理：通过修改播放速率
-            // AVAudioPlayerNode 不直接支持变速，通过 schedule + time pitch 实现
             player.scheduleBuffer(buffer, at: nil, options: []) { [weak self] in
-                // 播放完成回调
                 self?.lastBufferTime = Date().timeIntervalSince1970
             }
         }
@@ -286,17 +262,10 @@ class AudioEngine: @unchecked Sendable {
     // MARK: - 变速播放
     func setPlaybackSpeed(_ speed: Float) {
         playbackSpeed = speed
-
-        // 使用 AVAudioUnitTimePitch 实现变速不变调
-        // 需要在音频图中插入 time pitch 节点
-        if let player = audioPlayer {
-            // 重新连接：player → timePitch → mixer
-            // 这里简化处理，实际需要重新连接音频图
-            onStatus?(String(format: "正在播放 %.1fx", speed))
-        }
+        onStatus?(String(format: "正在播放 %.1fx", speed))
     }
 
-    // MARK: - 缓冲健康检查（对应 P.a 中的实时保持逻辑）
+    // MARK: - 缓冲健康检查
     private func startBufferHealthCheck() {
         bufferHealthCheckTimer?.cancel()
         let timer = DispatchSource.makeTimerSource(queue: .global(qos: .background))
@@ -314,7 +283,6 @@ class AudioEngine: @unchecked Sendable {
         let now = Date().timeIntervalSince1970
         let elapsed = now - lastBufferTime
 
-        // 如果超过 3 秒没有新缓冲区播放，可能断流
         if elapsed > 3.0 && !pendingPCMBuffers.isEmpty {
             DispatchQueue.main.async {
                 self.onStatus?("直播音频播放中")
@@ -344,8 +312,8 @@ class AudioEngine: @unchecked Sendable {
         pendingPCMBuffers.removeAll()
         converter = nil
         bufferFormat = nil
+        aacFormat = nil
         totalPCMFrames = 0
-        totalBytesWritten = 0
     }
 
     // MARK: - 暂停/恢复

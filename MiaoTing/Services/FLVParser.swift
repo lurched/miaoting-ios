@@ -18,7 +18,7 @@ enum FLVDataType: UInt8 {
 struct FLVTagHeader {
     let type: FLVDataType
     let dataSize: Int       // 3 bytes big-endian
-    let timestamp: Int      // 3 bytes + 1 byte extended
+    var timestamp: Int      // 3 bytes + 1 byte extended
     let streamID: Int       // 3 bytes (always 0)
 
     init?(data: Data) {
@@ -59,7 +59,7 @@ struct AACConfig {
         ]
 
         if srIndex < sampleRates.count {
-            self.sampleRate = sampleRates[srIndex]
+            self.sampleRate = sampleRates[Int(srIndex)]
         } else {
             self.sampleRate = 44100
         }
