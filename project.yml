@@ -2,7 +2,7 @@ name: MiaoTing
 options:
   bundleIdPrefix: com.syncrozero
   deploymentTarget:
-    iOS: "15.0"
+    iOS: "16.0"
   developmentLanguage: zh-Hans
   fileFormatVersion: "56"
   xcodeVersion: "15.0"

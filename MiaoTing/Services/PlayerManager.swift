@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class PlayerManager: ObservableObject {
+class PlayerManager: ObservableObject, @unchecked Sendable {
 
     @Published var status: PlayerStatus = .idle
     @Published var statusText: String = "等待输入"

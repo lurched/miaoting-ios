@@ -31,8 +31,8 @@ jobs:
 
       - name: Build .app (ad-hoc signed for linking)
         run: |
+          set -o pipefail
           # 用 ad-hoc 签名（-）让 Xcode 完成完整编译+链接
-          # 不用 CODE_SIGNING_ALLOWED=NO，那会跳过 link 步骤
           xcodebuild build \
             -project MiaoTing.xcodeproj \
             -scheme MiaoTing \

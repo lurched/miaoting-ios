@@ -9,7 +9,7 @@ import Foundation
 import AVFoundation
 import AudioToolbox
 
-class AudioEngine {
+class AudioEngine: @unchecked Sendable {
 
     // 回调
     var onStatus: ((String) -> Void)?
