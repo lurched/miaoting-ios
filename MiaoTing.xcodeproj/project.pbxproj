@@ -1,0 +1,299 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	class = {
+		objectclass = PBXProject;
+		objectVersion = 56;
+	};
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10001 /* MiaoTingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20001; };
+		A10002 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20002; };
+		A10003 /* PlatformDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20003; };
+		A10004 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20004; };
+		A10005 /* FLVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20005; };
+		A10006 /* AudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20006; };
+		A10007 /* StreamClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20007; };
+		A10008 /* PlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20008; };
+		A10009 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20009; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A20000 /* MiaoTing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MiaoTing.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20001 /* MiaoTingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiaoTingApp.swift; sourceTree = "<group>"; };
+		A20002 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		A20003 /* PlatformDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformDetector.swift; sourceTree = "<group>"; };
+		A20004 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		A20005 /* FLVParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLVParser.swift; sourceTree = "<group>"; };
+		A20006 /* AudioEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngine.swift; sourceTree = "<group>"; };
+		A20007 /* StreamClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamClient.swift; sourceTree = "<group>"; };
+		A20008 /* PlayerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerManager.swift; sourceTree = "<group>"; };
+		A20009 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		A2000A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A2000B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		A30000 /* = root group */ = {
+			isa = PBXGroup;
+			children = (
+				A30001 /* MiaoTing */,
+				A30002 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A30002 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A20000 /* MiaoTing.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A30001 /* MiaoTing */ = {
+			isa = PBXGroup;
+			children = (
+				A20001 /* MiaoTingApp.swift */,
+				A2000A /* Info.plist */,
+				A2000B /* Assets.xcassets */,
+				A30010 /* Models */,
+				A30011 /* Services */,
+				A30012 /* Views */,
+			);
+			path = MiaoTing;
+			sourceTree = "<group>";
+		};
+		A30010 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A20002 /* AppState.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A30011 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A20003 /* PlatformDetector.swift */,
+				A20004 /* APIClient.swift */,
+				A20005 /* FLVParser.swift */,
+				A20006 /* AudioEngine.swift */,
+				A20007 /* StreamClient.swift */,
+				A20008 /* PlayerManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A30012 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A20009 /* MainView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A40000 /* MiaoTing */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A60000 /* Build configuration list for MiaoTing */;
+			buildPhases = (
+				A50000 /* Sources */,
+				A50001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MiaoTing;
+			productName = MiaoTing;
+			productReference = A20000 /* MiaoTing.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A70000 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = A60001 /* Build configuration list for PBXProject */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "zh_CN";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				"zh_CN",
+				Base,
+			);
+			mainGroup = A30000;
+			productRefGroup = A30002 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A40000 /* MiaoTing */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A50001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A50010 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A50000 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10001 /* MiaoTingApp.swift in Sources */,
+				A10002 /* AppState.swift in Sources */,
+				A10003 /* PlatformDetector.swift in Sources */,
+				A10004 /* APIClient.swift in Sources */,
+				A10005 /* FLVParser.swift in Sources */,
+				A10006 /* AudioEngine.swift in Sources */,
+				A10007 /* StreamClient.swift in Sources */,
+				A10008 /* PlayerManager.swift in Sources */,
+				A10009 /* MainView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXBuildFile - Resources */
+		A50010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000B; };
+/* End */
+
+/* Begin XCBuildConfiguration section */
+		A80000 /* Debug — Project */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_PRECOMPILE_PREFIX_HEADER = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A80001 /* Release — Project */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREPROCESSOR_PRECOMPILE_PREFIX_HEADER = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A80002 /* Debug — Target */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 113;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MiaoTing/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "秒听";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.syncrozero.pro;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A80003 /* Release — Target */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 113;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MiaoTing/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "秒听";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.syncrozero.pro;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A60001 /* Build configuration list for PBXProject */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A80000 /* Debug */,
+				A80001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A60000 /* Build configuration list for MiaoTing */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A80002 /* Debug */,
+				A80003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = A70000 /* Project object */;
+}
