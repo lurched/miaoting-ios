@@ -199,7 +199,7 @@ class AudioEngine: @unchecked Sendable {
         aacBuffer.data?.withMemoryRebound(to: AudioStreamPacketDescription.self, capacity: 1) { desc in
             desc.pointee.mStartOffset = 0
             desc.pointee.mVariableFramesInPacket = 0
-            desc.pointee mDataByteSize = UInt32(dataSize)
+            desc.pointee.mDataByteSize = UInt32(dataSize)
         }
 
         var error: NSError?
