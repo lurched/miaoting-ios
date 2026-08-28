@@ -17,6 +17,7 @@
 		A10007 /* StreamClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20007; };
 		A10008 /* PlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20008; };
 		A10009 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20009; };
+		A1000A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000B; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,7 +36,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		A30000 /* = root group */ = {
+		A30000 /* Root */ = {
 			isa = PBXGroup;
 			children = (
 				A30001 /* MiaoTing */,
@@ -117,6 +118,11 @@
 /* Begin PBXProject section */
 		A70000 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+			};
 			buildConfigurationList = A60001 /* Build configuration list for PBXProject */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = "zh_CN";
@@ -125,7 +131,7 @@
 				"zh_CN",
 				Base,
 			);
-			mainGroup = A30000;
+			mainGroup = A30000 /* Root */;
 			productRefGroup = A30002 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -140,7 +146,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A50010 /* Assets.xcassets in Resources */,
+				A1000A /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -165,15 +171,12 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXBuildFile - Resources */
-		A50010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000B; };
-/* End */
-
 /* Begin XCBuildConfiguration section */
-		A80000 /* Debug — Project */ = {
+		A80000 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -182,9 +185,9 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_PRECOMPILE_PREFIX_HEADER = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				MTL_ENABLE_DEBUG_INFO = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -192,10 +195,11 @@
 			};
 			name = Debug;
 		};
-		A80001 /* Release — Project */ = {
+		A80001 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -203,9 +207,9 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_PREPROCESSOR_PRECOMPILE_PREFIX_HEADER = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -213,7 +217,7 @@
 			};
 			name = Release;
 		};
-		A80002 /* Debug — Target */ = {
+		A80002 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -224,10 +228,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MiaoTing/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "秒听";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIRequiresFullScreen = NO;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -242,7 +242,7 @@
 			};
 			name = Debug;
 		};
-		A80003 /* Release — Target */ = {
+		A80003 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -253,10 +253,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MiaoTing/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "秒听";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIRequiresFullScreen = NO;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
