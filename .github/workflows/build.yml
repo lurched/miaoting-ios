@@ -9,13 +9,19 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+      - name: List available Xcode versions
+        run: ls /Applications/ | grep Xcode
+
+      - name: Select latest Xcode
+        run: |
+          XCODE_PATH=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          echo "Using: $XCODE_PATH"
+          sudo xcode-select -s "$XCODE_PATH"
 
       - name: Print Xcode version
         run: xcodebuild -version
@@ -28,7 +34,9 @@ jobs:
 
       - name: List generated project
         run: |
+          echo "=== Project structure ==="
           ls -la
+          echo "=== xcodeproj ==="
           ls -la MiaoTing.xcodeproj/
 
       - name: Build archive (unsigned)
@@ -43,7 +51,9 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
-            AD_HOC_CODE_SIGNING_ALLOWED=YES
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            -destination "generic/platform=iOS" \
+            2>&1 | tee build_output.log
 
       - name: Export unsigned IPA
         run: |
@@ -74,7 +84,8 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            2>&1 | tee export_output.log
 
       - name: Rename IPA
         run: |
@@ -83,7 +94,7 @@ jobs:
           IPA_FILE=$(find . -name "*.ipa" | head -1)
           if [ -n "$IPA_FILE" ]; then
             cp "$IPA_FILE" MiaoTing-1.1.3-unsigned.ipa
-            echo "IPA: MiaoTing-1.1.3-unsigned.ipa"
+            echo "IPA ready: MiaoTing-1.1.3-unsigned.ipa"
             ls -la MiaoTing-1.1.3-unsigned.ipa
           else
             echo "No IPA found, listing output dir:"
@@ -105,5 +116,6 @@ jobs:
           name: build-logs
           path: |
             build/
-            *.log
+            build_output.log
+            export_output.log
           retention-days: 7
