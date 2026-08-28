@@ -182,11 +182,10 @@ class AudioEngine: @unchecked Sendable {
         var dataPtr: UnsafeMutablePointer<UInt8>?
         let dataSize = frame.data.count
 
-        guard let aacBuffer = AVAudioCompressedBuffer(format: aacFormat,
-                                                      packetCapacity: 1,
-                                                      maximumPacketSize: dataSize) else {
-            return
-        }
+        // 创建 compressed buffer 承载 AAC 原始数据
+        let aacBuffer = AVAudioCompressedBuffer(format: aacFormat,
+                                                 packetCapacity: 1,
+                                                 maximumPacketSize: dataSize)
 
         // 复制 AAC 数据到 compressed buffer
         frame.data.withUnsafeBytes { rawBuffer in
@@ -196,7 +195,7 @@ class AudioEngine: @unchecked Sendable {
         }
         aacBuffer.byteLength = UInt32(dataSize)
         aacBuffer.packetCount = 1
-        aacBuffer.data?.withMemoryRebound(to: AudioStreamPacketDescription.self, capacity: 1) { desc in
+        aacBuffer.data.withMemoryRebound(to: AudioStreamPacketDescription.self, capacity: 1) { desc in
             desc.pointee.mStartOffset = 0
             desc.pointee.mVariableFramesInPacket = 0
             desc.pointee.mDataByteSize = UInt32(dataSize)
