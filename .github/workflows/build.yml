@@ -14,9 +14,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: List available Xcode versions
-        run: ls /Applications/ | grep Xcode
-
       - name: Select latest Xcode
         run: |
           XCODE_PATH=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
@@ -32,13 +29,6 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
-      - name: List generated project
-        run: |
-          echo "=== Project structure ==="
-          ls -la
-          echo "=== xcodeproj ==="
-          ls -la MiaoTing.xcodeproj/
-
       - name: Build archive (unsigned)
         run: |
           xcodebuild archive \
@@ -51,62 +41,29 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
-            AD_HOC_CODE_SIGNING_ALLOWED=YES \
             -destination "generic/platform=iOS" \
             2>&1 | tee build_output.log
 
-      - name: Export unsigned IPA
+      - name: Create IPA from archive
         run: |
-          cat > ExportOptions.plist << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-                  <key>method</key>
-                  <string>development</string>
-                  <key>signingStyle</key>
-                  <string>manual</string>
-                  <key>provisioningProfiles</key>
-                  <dict/>
-                  <key>signingCertificate</key>
-                  <string></string>
-                  <key>stripSwiftSymbols</key>
-                  <true/>
-                  <key>compileBitcode</key>
-                  <false/>
-          </dict>
-          </plist>
-          EOF
-
-          xcodebuild -exportArchive \
-            -archivePath build/MiaoTing.xcarchive \
-            -exportPath build/output \
-            -exportOptionsPlist ExportOptions.plist \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            2>&1 | tee export_output.log
-
-      - name: Rename IPA
-        run: |
-          cd build/output
-          ls -la
-          IPA_FILE=$(find . -name "*.ipa" | head -1)
-          if [ -n "$IPA_FILE" ]; then
-            cp "$IPA_FILE" MiaoTing-1.1.3-unsigned.ipa
-            echo "IPA ready: MiaoTing-1.1.3-unsigned.ipa"
-            ls -la MiaoTing-1.1.3-unsigned.ipa
-          else
-            echo "No IPA found, listing output dir:"
-            ls -la
-            exit 1
-          fi
+          # 直接从 .xcarchive 手动构建 IPA
+          # Archive 结构: MiaoTing.xcarchive/Products/Applications/MiaoTing.app
+          mkdir -p build/Payload
+          cp -r build/MiaoTing.xcarchive/Products/Applications/MiaoTing.app build/Payload/
+          
+          # 移除现有签名（如果有）
+          find build/Payload/MiaoTing.app -name "_CodeSignature" -type d -exec rm -rf {} + 2>/dev/null || true
+          find build/Payload/MiaoTing.app -name "embedded.mobileprovision" -delete 2>/dev/null || true
+          
+          cd build
+          zip -r MiaoTing-1.1.3-unsigned.ipa Payload
+          ls -la MiaoTing-1.1.3-unsigned.ipa
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: MiaoTing-1.1.3-unsigned
-          path: build/output/MiaoTing-1.1.3-unsigned.ipa
+          path: build/MiaoTing-1.1.3-unsigned.ipa
           retention-days: 90
 
       - name: Upload build logs on failure
@@ -115,7 +72,6 @@ jobs:
         with:
           name: build-logs
           path: |
-            build/
             build_output.log
-            export_output.log
+            build/
           retention-days: 7
