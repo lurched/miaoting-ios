@@ -96,7 +96,8 @@ class AppState: ObservableObject {
 
     init() {
         self.apiToken = UserDefaults.standard.string(forKey: "apiToken") ?? ""
-        self.history = loadHistory()
+        self.history = []
+        self.history = Self.loadHistory()
     }
 
     func reset() {
@@ -111,7 +112,7 @@ class AppState: ObservableObject {
         UserDefaults.standard.set(dicts, forKey: "history")
     }
 
-    private func loadHistory() -> [HistoryEntry] {
+    private static func loadHistory() -> [HistoryEntry] {
         guard let dicts = UserDefaults.standard.array(forKey: "history") as? [[String: Any]] else {
             return []
         }
