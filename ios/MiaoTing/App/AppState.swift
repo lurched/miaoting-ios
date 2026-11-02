@@ -18,6 +18,28 @@ final class AppState: ObservableObject {
     @Published var showLogin = false
     @Published var showPaywall = false
 
+    enum Tab: Int, CaseIterable, Identifiable {
+        case listen, rooms, account
+        var id: Int { rawValue }
+        var title: String {
+            switch self {
+            case .listen: return "收听"
+            case .rooms: return "直播间"
+            case .account: return "账号"
+            }
+        }
+        var icon: String {
+            switch self {
+            case .listen: return "waveform"
+            case .rooms: return "list.bullet.rectangle"
+            case .account: return "person.crop.circle"
+            }
+        }
+    }
+
+    @Published var tab: Tab = .listen
+    @Published var searchText: String = ""
+
     // 数据
     @Published private(set) var rooms: [Room] = []
     @Published private(set) var plans: [Plan] = []
@@ -227,6 +249,10 @@ final class AppState: ObservableObject {
             errorMessage = "请先粘贴直播链接或播放直链。"
             return
         }
+        guard isLoggedIn else {
+            showLogin = true
+            return
+        }
         guard isEntitlementGateOpen else {
             showPaywall = true
             return
@@ -337,6 +363,16 @@ final class AppState: ObservableObject {
         preservesPitch = value
         playback.preservesPitch = value
     }
+
+    var filteredRooms: [Room] {
+        let keyword = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !keyword.isEmpty else { return sortedRooms }
+        return sortedRooms.filter {
+            $0.name.lowercased().contains(keyword) || $0.platformName.contains(keyword)
+        }
+    }
+
+    var lastTrace: APIClient.Trace? { api.lastTrace }
 
     // MARK: - 其它
 
