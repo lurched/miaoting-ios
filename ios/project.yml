@@ -1,0 +1,27 @@
+# XcodeGen 备用描述文件：装了 xcodegen 时，`cd ios && xcodegen` 可重新生成工程。
+name: MiaoTing
+options:
+  bundleIdPrefix: com.miaoting
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+targets:
+  MiaoTing:
+    type: application
+    platform: iOS
+    sources:
+      - path: MiaoTing
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.miaoting.ios
+        INFOPLIST_FILE: MiaoTing/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        MARKETING_VERSION: "1.1.3"
+        CURRENT_PROJECT_VERSION: "113"
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
