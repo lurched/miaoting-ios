@@ -28,8 +28,9 @@ enum LocalResolver {
             if let direct = LinkExtractor.xhsDirectURL(from: page.finalURL) {
                 list.insert(StreamCandidate(url: direct, protocolName: "http-flv", latencyTier: "unknown"), at: 0)
             }
-            if let t = extractTitle(from: page.html), !t.isEmpty, title.isEmpty {
-                title = t
+            if title.isEmpty {
+                let found = extractTitle(from: page.html)
+                if !found.isEmpty { title = found }
             }
             candidates.append(contentsOf: list)
             if CandidateRanker.hasPlayable(candidates) { break }
