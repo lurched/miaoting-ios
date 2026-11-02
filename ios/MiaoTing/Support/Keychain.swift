@@ -50,7 +50,21 @@ enum DeviceIdentity {
 
     private static let key = "machineId"
 
+    /// 允许在设置里覆盖机器码（比如填 Android 的 android_id，
+    /// 让服务端认为是同一台已绑定权益的设备）。
+    static var override: String? {
+        get { UserDefaults.standard.string(forKey: "machineIdOverride") }
+        set {
+            if let newValue, !newValue.isEmpty {
+                UserDefaults.standard.set(newValue, forKey: "machineIdOverride")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "machineIdOverride")
+            }
+        }
+    }
+
     static var machineId: String {
+        if let custom = override, custom.count >= 6 { return custom }
         if let saved = Keychain.read(key), saved.count >= 8 { return saved }
         let fresh = UUID().uuidString
         Keychain.save(fresh, for: key)
