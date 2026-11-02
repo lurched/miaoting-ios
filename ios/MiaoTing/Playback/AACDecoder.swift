@@ -58,10 +58,11 @@ final class AACDecoder {
         let asc = [UInt8](cfg.asc)
         let ascCount = asc.count
         asc.withUnsafeBufferPointer { buf in
+            guard let base = buf.baseAddress else { return }
             _ = AudioConverterSetProperty(newConverter,
                                           kAudioConverterDecompressionMagicCookie,
                                           UInt32(ascCount),
-                                          buf.baseAddress)
+                                          base)
         }
 
         converter = newConverter
