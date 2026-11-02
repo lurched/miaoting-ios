@@ -189,7 +189,7 @@ struct PaywallView: View {
     private func loadGroup() async {
         isLoadingGroup = true
         defer { isLoadingGroup = false }
-        guard let group = try? await APIClient.shared.recoveryGroup(), let group else { return }
+        guard let group = try? await APIClient.shared.recoveryGroup() else { return }
         groupImage = Self.decodeDataURL(group.qrDataURL)
     }
 
