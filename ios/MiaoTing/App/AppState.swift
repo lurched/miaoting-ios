@@ -286,33 +286,41 @@ final class AppState: ObservableObject {
             roomTitle = shareTitle
             input = target
 
-            // 1) 服务端识别
+            // 1) 服务端识别。失败原因先记下来，不要立刻弹给用户——
+            //    Android 端在 discover 异常时也会继续走本地解析，只有两条路都失败才提示。
+            var serverMessage: String?
+
             do {
                 let result = try await api.discover(url: target)
-                if let message = result.failureMessage {
-                    errorMessage = message
-                }
+                if let message = result.failureMessage { serverMessage = message }
                 if !result.roomTitle.isEmpty { shareTitle = result.roomTitle }
                 platformName = platformLabel(result.platform)
                 roomTitle = shareTitle.isEmpty ? "直播间" : shareTitle
 
                 if let best = CandidateRanker.best(from: result.candidates) {
+                    errorMessage = nil
                     play(url: best.url, title: roomTitle, platform: result.platform)
                     return
                 }
-                if result.candidates.isEmpty {
-                    banner = "服务器识别失败，尝试本地解析"
-                }
+                banner = "服务器识别失败，尝试本地解析"
             } catch {
+                serverMessage = error.localizedDescription
                 banner = "服务器识别失败，尝试本地解析"
             }
 
-            // 2) 本地兜底
+            // 2) 本地兜底：直接抓直播间页面抠流地址
             let local = await LocalResolver.hunt(pageURL: target)
             if !local.title.isEmpty { roomTitle = local.title }
             if let best = CandidateRanker.best(from: local.candidates) {
+                errorMessage = nil
                 play(url: best.url, title: roomTitle, platform: platformName)
-            } else if errorMessage == nil {
+                return
+            }
+
+            // 3) 两条路都失败：此时才把服务端的原话给用户
+            if let serverMessage {
+                errorMessage = serverMessage
+            } else {
                 errorMessage = "直播间暂未开播。"
             }
         }
