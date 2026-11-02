@@ -15,8 +15,8 @@ struct AccountView: View {
                 entitlementCard
                 aboutCard
                 actionList
-                if let trace = state.lastTrace, showTrace {
-                    traceCard(trace)
+                if showTrace {
+                    debugPanel
                 }
             }
             .padding(.horizontal, 16)
@@ -182,6 +182,67 @@ struct AccountView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+
+    private var debugPanel: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if !state.activeStreamURL.isEmpty { streamCard }
+
+            machineIdCard
+
+            if state.traces.isEmpty {
+                Text("还没有请求记录。")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textSecondary)
+            } else {
+                ForEach(Array(state.traces.enumerated().reversed()), id: \.offset) { item in
+                    traceCard(item.element)
+                }
+            }
+        }
+    }
+
+    private var machineIdCard: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("机器码（可填 Android 的 android_id）")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Theme.textSecondary)
+            TextField("留空则使用本机 UUID", text: Binding(
+                get: { state.machineIdOverride },
+                set: { state.machineIdOverride = $0 }
+            ))
+            .textFieldStyle(.plain)
+            .autocorrectionDisabled()
+            .textInputAutocapitalization(.never)
+            .font(.system(size: 11, design: .monospaced))
+            .foregroundStyle(Theme.textPrimary)
+            .padding(9)
+            .background(Color.black.opacity(0.4), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            Text("当前：\(state.machineId)")
+                .font(.system(size: 10, design: .monospaced))
+                .foregroundStyle(Theme.textSecondary.opacity(0.7))
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(Theme.surface, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(Theme.border, lineWidth: 1))
+    }
+
+    private var streamCard: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("当前播放地址")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Theme.textSecondary)
+            Text(state.activeStreamURL)
+                .font(.system(size: 10, design: .monospaced))
+                .foregroundStyle(Theme.accent)
+                .lineLimit(6)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(Color.black.opacity(0.4), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(Theme.border, lineWidth: 1))
     }
 
     private func traceCard(_ trace: APIClient.Trace) -> some View {
