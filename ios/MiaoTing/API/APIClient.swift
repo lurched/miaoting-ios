@@ -37,7 +37,12 @@ final class APIClient {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 20
         config.timeoutIntervalForResource = 40
-        config.httpAdditionalHeaders = ["Accept": "application/json"]
+        config.httpAdditionalHeaders = [
+            "Accept": "application/json",
+            // 与 Android 端 HttpURLConnection 的默认 UA 对齐。
+            // 服务端如果按 UA 判断「是不是自家客户端」，这能保证走同一条放行路径。
+            "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 14; Pixel 7 Build/UQ1A.240205.004)"
+        ]
         session = URLSession(configuration: config)
     }
 
