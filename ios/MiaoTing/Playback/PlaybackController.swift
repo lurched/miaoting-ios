@@ -55,6 +55,9 @@ final class PlaybackController {
     private var avPlayer: AVPlayer?
     private var itemStatusObservation: NSKeyValueObservation?
     private var timeObserver: Any?
+    private var watchdog: DispatchWorkItem?
+    /// 实际在播/正在连的地址，诊断面板用。
+    private(set) var activeStreamURL: String = ""
 
     private init() {
         player.onStateChange = { [weak self] state in
@@ -88,6 +91,7 @@ final class PlaybackController {
 
         demuxer.onPacket = { [weak self] packet, _ in
             guard let self else { return }
+            self.cancelWatchdog()          // 收到第一帧就算连接成功
             if let buffer = self.decoder.decode(packet: packet) {
                 self.player.enqueue(buffer)
             }
@@ -104,6 +108,7 @@ final class PlaybackController {
         stop()
         currentURL = url
         currentTitle = title
+        activeStreamURL = url.absoluteString
         onTitle?(title)
         status = .preparing
 
@@ -115,6 +120,8 @@ final class PlaybackController {
     }
 
     func stop() {
+        watchdog?.cancel()
+        watchdog = nil
         loader?.cancel()
         loader = nil
         demuxer.reset()
@@ -157,6 +164,7 @@ final class PlaybackController {
             }
         }
         loader.start(url: url, referer: Self.referer(for: url))
+        startWatchdog()
         BackgroundAudio.shared.updateNowPlaying(title: currentTitle, playing: true)
     }
 
@@ -192,6 +200,26 @@ final class PlaybackController {
         }
         av.playImmediately(atRate: speed)
         BackgroundAudio.shared.updateNowPlaying(title: currentTitle, playing: true)
+    }
+
+    /// 12 秒内没收到任何音频帧就判超时，避免界面永远停在「正在连接」。
+    private func startWatchdog(seconds: TimeInterval = 12) {
+        watchdog?.cancel()
+        let item = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            if self.status == .preparing {
+                self.status = .failed("连接超时：\(Int(seconds)) 秒内没有收到音频数据。")
+                self.loader?.cancel()
+                self.loader = nil
+            }
+        }
+        watchdog = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: item)
+    }
+
+    private func cancelWatchdog() {
+        watchdog?.cancel()
+        watchdog = nil
     }
 
     private func teardownAVPlayer() {
