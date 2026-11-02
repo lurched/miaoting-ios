@@ -22,9 +22,13 @@
 		F878225CE37229AB55C18D87 /* PlaybackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E56465C38BACB85E86C921F0 /* PlaybackController.swift */; };
 		B47C581521318D11299D3E49 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678EE5C90C558B1361961AEE /* Keychain.swift */; };
 		0DD068631DE4ECBECE18E1DF /* PatchFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5CA4A87A2071B50F0CB902 /* PatchFlags.swift */; };
+		68BF0ECD42A41AC09C519353 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E768A0CBDF4CD9844136929 /* AccountView.swift */; };
+		D97FE7C2C4E686901ED3F872 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF0329F6BD4F41AFF8140A3 /* Components.swift */; };
 		B96FC206067B64A036850B6F /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D82255D7DE27C0268697E57 /* HomeView.swift */; };
+		77CD3AD4E4DCF8210E0F1B71 /* ListenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8336223F54B244409D5FEC3D /* ListenView.swift */; };
 		32132CE72440859A9CDA57D2 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225588BCDB7352F6D2EF9BD7 /* LoginView.swift */; };
 		CD83C22BE15F18D9B52C6839 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F2DB188DE86ED934884FF /* PaywallView.swift */; };
+		D3788C6C0BCFFE344B6DA6D5 /* RoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFFF0438BE098D18DD4707C6 /* RoomsView.swift */; };
 		A57614D5E31DE1E37D92DF1F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D76E442009BBE602E83DB9D /* Theme.swift */; };
 		D3B2F64B06C1554C6A6956AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24D66C2E4EAFB44A5315E98C /* Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -48,9 +52,13 @@
 		E56465C38BACB85E86C921F0 /* PlaybackController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackController.swift; sourceTree = "<group>"; };
 		678EE5C90C558B1361961AEE /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		7E5CA4A87A2071B50F0CB902 /* PatchFlags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatchFlags.swift; sourceTree = "<group>"; };
+		2E768A0CBDF4CD9844136929 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
+		8FF0329F6BD4F41AFF8140A3 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		4D82255D7DE27C0268697E57 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		8336223F54B244409D5FEC3D /* ListenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListenView.swift; sourceTree = "<group>"; };
 		225588BCDB7352F6D2EF9BD7 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		D76F2DB188DE86ED934884FF /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		EFFF0438BE098D18DD4707C6 /* RoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomsView.swift; sourceTree = "<group>"; };
 		2D76E442009BBE602E83DB9D /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -133,9 +141,13 @@
 		B8920565B0880BE80B674A5E /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				2E768A0CBDF4CD9844136929 /* AccountView.swift */,
+				8FF0329F6BD4F41AFF8140A3 /* Components.swift */,
 				4D82255D7DE27C0268697E57 /* HomeView.swift */,
+				8336223F54B244409D5FEC3D /* ListenView.swift */,
 				225588BCDB7352F6D2EF9BD7 /* LoginView.swift */,
 				D76F2DB188DE86ED934884FF /* PaywallView.swift */,
+				EFFF0438BE098D18DD4707C6 /* RoomsView.swift */,
 				2D76E442009BBE602E83DB9D /* Theme.swift */,
 			);
 			path = Views;
@@ -233,9 +245,13 @@
 				F878225CE37229AB55C18D87 /* PlaybackController.swift in Sources */,
 				B47C581521318D11299D3E49 /* Keychain.swift in Sources */,
 				0DD068631DE4ECBECE18E1DF /* PatchFlags.swift in Sources */,
+				68BF0ECD42A41AC09C519353 /* AccountView.swift in Sources */,
+				D97FE7C2C4E686901ED3F872 /* Components.swift in Sources */,
 				B96FC206067B64A036850B6F /* HomeView.swift in Sources */,
+				77CD3AD4E4DCF8210E0F1B71 /* ListenView.swift in Sources */,
 				32132CE72440859A9CDA57D2 /* LoginView.swift in Sources */,
 				CD83C22BE15F18D9B52C6839 /* PaywallView.swift in Sources */,
+				D3788C6C0BCFFE344B6DA6D5 /* RoomsView.swift in Sources */,
 				A57614D5E31DE1E37D92DF1F /* Theme.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
