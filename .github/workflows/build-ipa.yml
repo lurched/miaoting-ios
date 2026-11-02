@@ -1,0 +1,67 @@
+name: Build unsigned IPA
+
+# 没有 Mac 也能出包：在 GitHub 的 macOS runner 上编译，产物是未签名 ipa，
+# 下载后用你自己的证书（Sideloadly / AltStore / ESign / TrollStore）安装。
+#
+# 用法：仓库 → Actions → Build unsigned IPA → Run workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "ios/**"
+      - ".github/workflows/build-ipa.yml"
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+
+      - name: Build .app (unsigned)
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project ios/MiaoTing.xcodeproj \
+            -scheme MiaoTing \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package IPA
+        run: |
+          set -euo pipefail
+          APP="build/Build/Products/Release-iphoneos/MiaoTing.app"
+          if [ ! -d "$APP" ]; then
+            echo "构建产物不存在: $APP"
+            find build -name "*.app" -maxdepth 6 || true
+            exit 1
+          fi
+          rm -rf build/ipa
+          mkdir -p build/ipa/Payload
+          cp -R "$APP" build/ipa/Payload/
+          ( cd build/ipa && zip -qry ../MiaoTing-unsigned.ipa Payload )
+          ls -lh build/MiaoTing-unsigned.ipa
+          unzip -l build/MiaoTing-unsigned.ipa | head -20
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiaoTing-unsigned-ipa
+          path: build/MiaoTing-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 30
