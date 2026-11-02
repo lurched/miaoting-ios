@@ -354,7 +354,6 @@ final class AppState: ObservableObject {
 
     func loadWelcome() async {
         guard let welcome = try? await api.newUserWelcome() else { return }
-        guard let welcome else { return }
         banner = welcome.title + "：" + welcome.message
     }
 
