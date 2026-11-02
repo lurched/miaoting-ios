@@ -82,6 +82,9 @@ struct Entitlement: Equatable {
     let expiresAt: String
     let remainingMs: Double
     let orderId: String
+    let planLabel: String
+    let boundDeviceCount: Int
+    let maxDevices: Int
 
     init?(json: JSONDictionary?) {
         guard let json else { return nil }
@@ -90,7 +93,44 @@ struct Entitlement: Equatable {
         expiresAt = json["expiresAt"] as? String ?? ""
         remainingMs = (json["remainingMs"] as? NSNumber)?.doubleValue ?? 0
         orderId = json["orderId"] as? String ?? ""
+        planLabel = json["planLabel"] as? String ?? ""
+        boundDeviceCount = json["boundDeviceCount"] as? Int ?? 0
+        maxDevices = json["maxDevices"] as? Int ?? 5
     }
+
+    /// 对应 Android 权益面板的状态文案。
+    var stateLabel: String {
+        switch state {
+        case "expired": return "权益已到期"
+        case "active": return isActive ? "权益有效" : "权益已到期"
+        case "device_limit": return "设备数已满"
+        case "inactive": return "未开通"
+        default: return state.isEmpty ? "未开通" : state
+        }
+    }
+
+    /// 到期时间文案。
+    var expiryLabel: String {
+        if isLifetime { return "永久有效" }
+        if let date = Self.parse(expiresAt) {
+            let f = DateFormatter()
+            f.locale = Locale(identifier: "zh_CN")
+            f.dateFormat = "yyyy/MM/dd HH:mm"
+            return f.string(from: date)
+        }
+        return expiresAt.isEmpty ? "—" : expiresAt
+    }
+
+    /// 剩余文案：X天Y小时 / 永久 / 0小时。
+    var remainingLabel: String {
+        if isLifetime { return "永久" }
+        guard remainingMs > 0 else { return "0小时" }
+        let hours = Int(remainingMs / 3_600_000)
+        let days = hours / 24
+        return days > 0 ? "\(days)天\(hours % 24)小时" : "\(hours)小时"
+    }
+
+    var deviceLabel: String { "\(boundDeviceCount)/\(maxDevices)" }
 
     /// 与 Android 端 `MainActivity.B()` 的判定完全一致：
     /// state == active 且（永久 或 remainingMs > 0 或 expiresAt 在未来）。
