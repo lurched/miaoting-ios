@@ -78,9 +78,13 @@ enum LocalResolver {
 
     static func extractCandidates(from html: String) -> [StreamCandidate] {
         var result: [StreamCandidate] = []
-        // 抖音把直播数据塞在 RENDER_DATA 里，整段是 percent-encoded 的 JSON，
-        // 不解码的话正则根本匹配不到 https://。
-        for raw in LinkExtractor.urls(in: percentDecoded(html)) {
+        // 优先从原文抽；只有抽不到时才尝试整体解码。
+        // （抖音短链 302 到的 reflow 页面里 flv 地址是明文，整体解码反而会破坏参数）
+        var urls = LinkExtractor.urls(in: html)
+        if urls.isEmpty {
+            urls = LinkExtractor.urls(in: percentDecoded(html))
+        }
+        for raw in urls {
             let lower = raw.lowercased()
             if LinkExtractor.isFLV(raw) && lower.contains("only_audio=1") {
                 result.append(StreamCandidate(url: raw, protocolName: "http-flv", latencyTier: "unknown", playable: true))
