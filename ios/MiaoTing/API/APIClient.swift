@@ -31,7 +31,8 @@ final class APIClient {
         let body: String
         let at: Date
     }
-    private(set) var lastTrace: Trace?
+    private(set) var traces: [Trace] = []
+    var lastTrace: Trace? { traces.last }
 
     private init() {
         let config = URLSessionConfiguration.default
@@ -85,8 +86,9 @@ final class APIClient {
         let (data, response) = try await session.data(for: request)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         let raw = String(data: data, encoding: .utf8) ?? "<\(data.count) bytes non-utf8>"
-        lastTrace = Trace(method: method, path: path, status: status,
-                          body: String(raw.prefix(600)), at: Date())
+        traces.append(Trace(method: method, path: path, status: status,
+                            body: String(raw.prefix(600)), at: Date()))
+        if traces.count > 10 { traces.removeFirst(traces.count - 10) }
         let json = (try? JSONSerialization.jsonObject(with: data)) as? JSONDictionary ?? [:]
 
         if status >= 200, status < 300 {
