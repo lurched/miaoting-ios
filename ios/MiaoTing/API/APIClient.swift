@@ -23,6 +23,16 @@ final class APIClient {
     private let session: URLSession
     private(set) var token: String?
 
+    /// 最近一次请求的诊断信息，界面上可展开查看。
+    struct Trace {
+        let method: String
+        let path: String
+        let status: Int
+        let body: String
+        let at: Date
+    }
+    private(set) var lastTrace: Trace?
+
     private init() {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 20
@@ -69,15 +79,22 @@ final class APIClient {
 
         let (data, response) = try await session.data(for: request)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        let raw = String(data: data, encoding: .utf8) ?? "<\(data.count) bytes non-utf8>"
+        lastTrace = Trace(method: method, path: path, status: status,
+                          body: String(raw.prefix(600)), at: Date())
         let json = (try? JSONSerialization.jsonObject(with: data)) as? JSONDictionary ?? [:]
 
         if status >= 200, status < 300 {
+            if json.isEmpty, !raw.isEmpty {
+                throw APIError(message: "响应不是 JSON（HTTP \(status)）：\(raw.prefix(120))", statusCode: status)
+            }
             return json
         }
         if tolerateFailureStatus {
             return json
         }
-        let message = json["error"] as? String ?? "请求失败（HTTP \(status)）"
+        let message = json["error"] as? String
+            ?? "请求失败（HTTP \(status)）：\(raw.prefix(120))"
         throw APIError(message: message, statusCode: status)
     }
 
