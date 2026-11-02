@@ -60,7 +60,7 @@ final class AppState: ObservableObject {
     @Published var isBusy = false
     @Published var banner: String?
 
-    let machineId = DeviceIdentity.machineId
+    var machineId: String { DeviceIdentity.machineId }
 
     private let api = APIClient.shared
     private let playback = PlaybackController.shared
@@ -380,7 +380,19 @@ final class AppState: ObservableObject {
         }
     }
 
+    var traces: [APIClient.Trace] { api.traces }
     var lastTrace: APIClient.Trace? { api.lastTrace }
+
+    var machineIdOverride: String {
+        get { DeviceIdentity.override ?? "" }
+        set {
+            DeviceIdentity.override = newValue.isEmpty ? nil : newValue
+            objectWillChange.send()
+        }
+    }
+
+    /// 当前实际播放/尝试连接的地址，贴在诊断面板里。
+    var activeStreamURL: String { playback.activeStreamURL }
 
     // MARK: - 其它
 
