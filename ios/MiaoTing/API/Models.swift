@@ -159,12 +159,19 @@ struct StreamCandidate {
     let latencyTier: String
     let playable: Bool
 
+    init(url: String, protocolName: String, latencyTier: String = "unknown", playable: Bool = true) {
+        self.url = url
+        self.protocolName = protocolName
+        self.latencyTier = latencyTier
+        self.playable = playable
+    }
+
     init?(json: JSONDictionary) {
         guard let url = json["url"] as? String, !url.isEmpty else { return nil }
-        self.url = url
-        protocolName = json["protocolName"] as? String ?? json["protocol"] as? String ?? ""
-        latencyTier = json["latencyTier"] as? String ?? "unknown"
-        playable = json["playable"] as? Bool ?? true
+        self.init(url: url,
+                  protocolName: json["protocolName"] as? String ?? json["protocol"] as? String ?? "",
+                  latencyTier: json["latencyTier"] as? String ?? "unknown",
+                  playable: json["playable"] as? Bool ?? true)
     }
 }
 
@@ -185,7 +192,7 @@ struct DiscoverResult {
 
         let result = json["result"] as? JSONDictionary
         let rawCandidates = result?["candidates"] as? [JSONDictionary] ?? []
-        candidates = rawCandidates.compactMap(StreamCandidate.init)
+        candidates = rawCandidates.compactMap { StreamCandidate(json: $0) }
 
         let diagnostics = json["diagnostics"] as? JSONDictionary ?? [:]
         hasRateLimit = diagnostics["hasRateLimit"] as? Bool ?? false
