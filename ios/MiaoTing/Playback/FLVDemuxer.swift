@@ -123,10 +123,10 @@ final class FLVDemuxer {
         guard asc.count >= 2 else { return nil }
         let b0 = asc[asc.startIndex]
         let b1 = asc[asc.startIndex + 1]
-        let objectType = (b0 >> 3) & 0x1F
+        let objectType = Int((b0 >> 3) & 0x1F)
         guard objectType == 2 || objectType == 5 else { return nil }   // AAC-LC / HE-AAC
 
-        let freqIndex = ((b0 & 0x07) << 1) | ((b1 >> 7) & 0x01)
+        let freqIndex = Int(((b0 & 0x07) << 1) | ((b1 >> 7) & 0x01))
         var channelConfig = Int((b1 >> 3) & 0x0F)
         channelConfig = channelConfig == 7 ? 8 : max(1, channelConfig)
 
