@@ -1,0 +1,353 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AF5D6DAFC2D97F0A7E37FA66 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6147411DCB09A04F424DE7F9 /* APIClient.swift */; };
+		93B5C913108F741DAFFBDB91 /* CandidateRanker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB422810D62EF8FA959DC579 /* CandidateRanker.swift */; };
+		BCF6E248FC3B6C2A45E7DA5D /* LinkExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA3BE30F7E9634790DCBA99 /* LinkExtractor.swift */; };
+		FC9AB9F4975593A44D514690 /* LocalResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0F2E8170B420C212F09383 /* LocalResolver.swift */; };
+		1D77DFE0689BBC63EE249CA0 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7CCA7A867826C7244EC6BE /* Models.swift */; };
+		9BF5C2E15E2D753C68CEE94D /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECBBF00080A17069A707F1B3 /* AppState.swift */; };
+		5E869F4035398F95C2CEF1D7 /* MiaoTingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20543F0383AE67D70857DD5 /* MiaoTingApp.swift */; };
+		02EAA2D19182F6AC835B7CD5 /* AACDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC6A95A91B92906580F0E3FF /* AACDecoder.swift */; };
+		1F4F7D3073E56EB1116466BA /* BackgroundAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76472B5714BE847D731D9DFF /* BackgroundAudio.swift */; };
+		15D0BB2E60818A5E079D22C8 /* FLVDemuxer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF7706DCDB103DF0AD4CEB82 /* FLVDemuxer.swift */; };
+		AB4962BC825A3A0FD573F224 /* FLVStreamLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D5DEA7D49141B81616A6E1 /* FLVStreamLoader.swift */; };
+		933D90CFF41CA14262F81C5F /* LiveAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642D8D53E9E0EF74FA493D3 /* LiveAudioPlayer.swift */; };
+		F878225CE37229AB55C18D87 /* PlaybackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E56465C38BACB85E86C921F0 /* PlaybackController.swift */; };
+		B47C581521318D11299D3E49 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678EE5C90C558B1361961AEE /* Keychain.swift */; };
+		0DD068631DE4ECBECE18E1DF /* PatchFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5CA4A87A2071B50F0CB902 /* PatchFlags.swift */; };
+		B96FC206067B64A036850B6F /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D82255D7DE27C0268697E57 /* HomeView.swift */; };
+		32132CE72440859A9CDA57D2 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225588BCDB7352F6D2EF9BD7 /* LoginView.swift */; };
+		CD83C22BE15F18D9B52C6839 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D76F2DB188DE86ED934884FF /* PaywallView.swift */; };
+		A57614D5E31DE1E37D92DF1F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D76E442009BBE602E83DB9D /* Theme.swift */; };
+		D3B2F64B06C1554C6A6956AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24D66C2E4EAFB44A5315E98C /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		EEA620B8F94843C7F986290F /* MiaoTing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MiaoTing.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B34B0507FE00BF36365A62E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		24D66C2E4EAFB44A5315E98C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6147411DCB09A04F424DE7F9 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		EB422810D62EF8FA959DC579 /* CandidateRanker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateRanker.swift; sourceTree = "<group>"; };
+		0EA3BE30F7E9634790DCBA99 /* LinkExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkExtractor.swift; sourceTree = "<group>"; };
+		AB0F2E8170B420C212F09383 /* LocalResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalResolver.swift; sourceTree = "<group>"; };
+		7A7CCA7A867826C7244EC6BE /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		ECBBF00080A17069A707F1B3 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		C20543F0383AE67D70857DD5 /* MiaoTingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiaoTingApp.swift; sourceTree = "<group>"; };
+		CC6A95A91B92906580F0E3FF /* AACDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AACDecoder.swift; sourceTree = "<group>"; };
+		76472B5714BE847D731D9DFF /* BackgroundAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundAudio.swift; sourceTree = "<group>"; };
+		EF7706DCDB103DF0AD4CEB82 /* FLVDemuxer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLVDemuxer.swift; sourceTree = "<group>"; };
+		18D5DEA7D49141B81616A6E1 /* FLVStreamLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLVStreamLoader.swift; sourceTree = "<group>"; };
+		2642D8D53E9E0EF74FA493D3 /* LiveAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveAudioPlayer.swift; sourceTree = "<group>"; };
+		E56465C38BACB85E86C921F0 /* PlaybackController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackController.swift; sourceTree = "<group>"; };
+		678EE5C90C558B1361961AEE /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
+		7E5CA4A87A2071B50F0CB902 /* PatchFlags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatchFlags.swift; sourceTree = "<group>"; };
+		4D82255D7DE27C0268697E57 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		225588BCDB7352F6D2EF9BD7 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		D76F2DB188DE86ED934884FF /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		2D76E442009BBE602E83DB9D /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		349B578E88FC623128D2018B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2A44C54E23411059C3A1A1E1 = {
+			isa = PBXGroup;
+			children = (
+				6A00E57238C73AFDF567F78A /* MiaoTing */,
+				433D647A17039DC680DEAE8F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6A00E57238C73AFDF567F78A /* MiaoTing */ = {
+			isa = PBXGroup;
+			children = (
+				BA6ED69159119B1A090E1AD2 /* API */,
+				AC6545EDE5A39074A15E6244 /* App */,
+				86FE215242733AED112E515A /* Playback */,
+				2CD0A269CFE4D539EAB6E80C /* Support */,
+				B8920565B0880BE80B674A5E /* Views */,
+				24D66C2E4EAFB44A5315E98C /* Assets.xcassets */,
+				B34B0507FE00BF36365A62E0 /* Info.plist */,
+			);
+			path = MiaoTing;
+			sourceTree = "<group>";
+		};
+		BA6ED69159119B1A090E1AD2 /* API */ = {
+			isa = PBXGroup;
+			children = (
+				6147411DCB09A04F424DE7F9 /* APIClient.swift */,
+				EB422810D62EF8FA959DC579 /* CandidateRanker.swift */,
+				0EA3BE30F7E9634790DCBA99 /* LinkExtractor.swift */,
+				AB0F2E8170B420C212F09383 /* LocalResolver.swift */,
+				7A7CCA7A867826C7244EC6BE /* Models.swift */,
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
+		AC6545EDE5A39074A15E6244 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				ECBBF00080A17069A707F1B3 /* AppState.swift */,
+				C20543F0383AE67D70857DD5 /* MiaoTingApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		86FE215242733AED112E515A /* Playback */ = {
+			isa = PBXGroup;
+			children = (
+				CC6A95A91B92906580F0E3FF /* AACDecoder.swift */,
+				76472B5714BE847D731D9DFF /* BackgroundAudio.swift */,
+				EF7706DCDB103DF0AD4CEB82 /* FLVDemuxer.swift */,
+				18D5DEA7D49141B81616A6E1 /* FLVStreamLoader.swift */,
+				2642D8D53E9E0EF74FA493D3 /* LiveAudioPlayer.swift */,
+				E56465C38BACB85E86C921F0 /* PlaybackController.swift */,
+			);
+			path = Playback;
+			sourceTree = "<group>";
+		};
+		2CD0A269CFE4D539EAB6E80C /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				678EE5C90C558B1361961AEE /* Keychain.swift */,
+				7E5CA4A87A2071B50F0CB902 /* PatchFlags.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		B8920565B0880BE80B674A5E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4D82255D7DE27C0268697E57 /* HomeView.swift */,
+				225588BCDB7352F6D2EF9BD7 /* LoginView.swift */,
+				D76F2DB188DE86ED934884FF /* PaywallView.swift */,
+				2D76E442009BBE602E83DB9D /* Theme.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		433D647A17039DC680DEAE8F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EEA620B8F94843C7F986290F /* MiaoTing.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F6B26B9AE16537A049B36DA7 /* MiaoTing */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 88A9556C78F4D881C352E222 /* Build configuration list for PBXNativeTarget "MiaoTing" */;
+			buildPhases = (
+				F3F3D267CF0FD5307403D537 /* Sources */,
+				349B578E88FC623128D2018B /* Frameworks */,
+				41B260B1D2A5E0B273280C8E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MiaoTing;
+			productName = MiaoTing;
+			productReference = EEA620B8F94843C7F986290F /* MiaoTing.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		26D804E91BA5305940868ADA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					F6B26B9AE16537A049B36DA7 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 887D4B5F61EA6AAAF609F3AC /* Build configuration list for PBXProject "MiaoTing" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = zh_CN;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				zh_CN,
+				Base,
+			);
+			mainGroup = 2A44C54E23411059C3A1A1E1;
+			productRefGroup = 433D647A17039DC680DEAE8F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F6B26B9AE16537A049B36DA7 /* MiaoTing */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		41B260B1D2A5E0B273280C8E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D3B2F64B06C1554C6A6956AF /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F3F3D267CF0FD5307403D537 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF5D6DAFC2D97F0A7E37FA66 /* APIClient.swift in Sources */,
+				93B5C913108F741DAFFBDB91 /* CandidateRanker.swift in Sources */,
+				BCF6E248FC3B6C2A45E7DA5D /* LinkExtractor.swift in Sources */,
+				FC9AB9F4975593A44D514690 /* LocalResolver.swift in Sources */,
+				1D77DFE0689BBC63EE249CA0 /* Models.swift in Sources */,
+				9BF5C2E15E2D753C68CEE94D /* AppState.swift in Sources */,
+				5E869F4035398F95C2CEF1D7 /* MiaoTingApp.swift in Sources */,
+				02EAA2D19182F6AC835B7CD5 /* AACDecoder.swift in Sources */,
+				1F4F7D3073E56EB1116466BA /* BackgroundAudio.swift in Sources */,
+				15D0BB2E60818A5E079D22C8 /* FLVDemuxer.swift in Sources */,
+				AB4962BC825A3A0FD573F224 /* FLVStreamLoader.swift in Sources */,
+				933D90CFF41CA14262F81C5F /* LiveAudioPlayer.swift in Sources */,
+				F878225CE37229AB55C18D87 /* PlaybackController.swift in Sources */,
+				B47C581521318D11299D3E49 /* Keychain.swift in Sources */,
+				0DD068631DE4ECBECE18E1DF /* PatchFlags.swift in Sources */,
+				B96FC206067B64A036850B6F /* HomeView.swift in Sources */,
+				32132CE72440859A9CDA57D2 /* LoginView.swift in Sources */,
+				CD83C22BE15F18D9B52C6839 /* PaywallView.swift in Sources */,
+				A57614D5E31DE1E37D92DF1F /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A1FEF218C4C57CE118AD5A8A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = -Onone;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		D49EF4AC7029FD1A8C1140E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = -O;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FEE7AE1A1C8291DDE6965C1D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 113;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MiaoTing/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.1.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.miaoting.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		71B50D198E64EEE00C2C0E9C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 113;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MiaoTing/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.1.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.miaoting.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		887D4B5F61EA6AAAF609F3AC /* Build configuration list for PBXProject "MiaoTing" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1FEF218C4C57CE118AD5A8A /* Debug */,
+				D49EF4AC7029FD1A8C1140E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		88A9556C78F4D881C352E222 /* Build configuration list for PBXNativeTarget "MiaoTing" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FEE7AE1A1C8291DDE6965C1D /* Debug */,
+				71B50D198E64EEE00C2C0E9C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 26D804E91BA5305940868ADA /* Project object */;
+}
