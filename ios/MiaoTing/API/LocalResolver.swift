@@ -18,42 +18,68 @@ enum LocalResolver {
             return Result(title: "", candidates: [])
         }
 
-        var html = ""
-        var finalURL = pageURL
-        do {
-            var request = URLRequest(url: URL(string: pageURL)!)
-            request.timeoutInterval = 15
-            request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-            request.setValue(desktopUA, forHTTPHeaderField: "User-Agent")
-            request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-                             forHTTPHeaderField: "Accept")
-            request.setValue("zh-CN,zh;q=0.9,en;q=0.8", forHTTPHeaderField: "Accept-Language")
-            request.setValue(referer(for: pageURL), forHTTPHeaderField: "Referer")
+        var candidates: [StreamCandidate] = []
+        var title = ""
 
-            let (data, response) = try await URLSession.shared.data(for: request)
-            finalURL = response.url?.absoluteString ?? pageURL
-            html = decode(data)
-        } catch {
-            return Result(title: "", candidates: [])
+        for url in candidatePageURLs(pageURL) {
+            guard let page = await fetch(url) else { continue }
+
+            var list = extractCandidates(from: page.html)
+            if let direct = LinkExtractor.xhsDirectURL(from: page.finalURL) {
+                list.insert(StreamCandidate(url: direct, protocolName: "http-flv", latencyTier: "unknown"), at: 0)
+            }
+            if let t = extractTitle(from: page.html), !t.isEmpty, title.isEmpty {
+                title = t
+            }
+            candidates.append(contentsOf: list)
+            if CandidateRanker.hasPlayable(candidates) { break }
         }
 
-        var candidates = extractCandidates(from: html)
-
-        // 小红书：直播间号直接拼官方 CDN 的 _orig.flv，比页面里的 HLS 更实时。
-        if let direct = LinkExtractor.xhsDirectURL(from: finalURL) {
-            candidates.insert(StreamCandidate(url: direct, protocolName: "http-flv", latencyTier: "unknown", playable: true),
-                              at: 0)
-        }
-
-        let title = extractTitle(from: html) 
         return Result(title: title, candidates: CandidateRanker.dedup(candidates))
+    }
+
+    /// 抖音的「关注页直播」链接是 `www.douyin.com/follow/live/<id>`，
+    /// 真正的直播间页在 `live.douyin.com/<id>`，两个都试一次。
+    static func candidatePageURLs(_ pageURL: String) -> [String] {
+        var urls = [pageURL]
+        guard LinkExtractor.host(of: pageURL).contains("douyin.com") else { return urls }
+        let parts = URL(string: pageURL)?.pathComponents.filter { !$0.isEmpty } ?? []
+        if let index = parts.firstIndex(of: "live"), index + 1 < parts.count {
+            let roomId = parts[index + 1]
+            if roomId.range(of: "^\\d+$", options: .regularExpression) != nil {
+                urls.append("https://live.douyin.com/\(roomId)")
+            }
+        }
+        return urls
+    }
+
+    static func fetch(_ url: String) async -> (html: String, finalURL: String)? {
+        guard let target = URL(string: url) else { return nil }
+        var request = URLRequest(url: target)
+        request.timeoutInterval = 15
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        request.setValue(desktopUA, forHTTPHeaderField: "User-Agent")
+        request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                         forHTTPHeaderField: "Accept")
+        request.setValue("zh-CN,zh;q=0.9,en;q=0.8", forHTTPHeaderField: "Accept-Language")
+        request.setValue(referer(for: url), forHTTPHeaderField: "Referer")
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            let finalURL = response.url?.absoluteString ?? url
+            return (decode(data), finalURL)
+        } catch {
+            return nil
+        }
     }
 
     // MARK: - 抽取
 
     static func extractCandidates(from html: String) -> [StreamCandidate] {
         var result: [StreamCandidate] = []
-        for raw in LinkExtractor.urls(in: html) {
+        // 抖音把直播数据塞在 RENDER_DATA 里，整段是 percent-encoded 的 JSON，
+        // 不解码的话正则根本匹配不到 https://。
+        for raw in LinkExtractor.urls(in: percentDecoded(html)) {
             let lower = raw.lowercased()
             if LinkExtractor.isFLV(raw) && lower.contains("only_audio=1") {
                 result.append(StreamCandidate(url: raw, protocolName: "http-flv", latencyTier: "unknown", playable: true))
@@ -66,6 +92,19 @@ enum LocalResolver {
             }
         }
         return result
+    }
+
+    /// 把 `%3A%2F%2F` 这类整体编码的片段还原，最多解两轮（有的页面会二次编码）。
+    static func percentDecoded(_ html: String) -> String {
+        var text = html
+        for _ in 0..<2 {
+            guard text.contains("%3A") || text.contains("%3a") || text.contains("%2F") || text.contains("%2f") else {
+                return text
+            }
+            guard let decoded = text.removingPercentEncoding, decoded != text else { return text }
+            text = decoded
+        }
+        return text
     }
 
     /// 先找页面内 JSON 的 nickName/nickname/roomTitle/title，再退回 <title>。
