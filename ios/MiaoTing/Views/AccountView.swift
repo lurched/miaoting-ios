@@ -252,6 +252,22 @@ struct AccountView: View {
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundStyle(Theme.textSecondary)
                 .textSelection(.enabled)
+
+            HStack(spacing: 10) {
+                Button("播放测试音") { PlaybackController.shared.playTestTone() }
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.black)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(Theme.accent, in: Capsule())
+                Button("刷新诊断") { state.refreshDiagnostics() }
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(Theme.surfaceHigh, in: Capsule())
+                Spacer()
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
