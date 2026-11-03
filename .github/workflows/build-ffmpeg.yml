@@ -1,0 +1,55 @@
+name: build-ffmpeg
+
+# 只编译 iOS 版的 ffmpeg 静态库（FLV demux + AAC 解码），产物作为 artifact 给主构建用。
+on:
+  push:
+    paths:
+      - '.github/workflows/build-ffmpeg.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Fetch source
+        run: |
+          set -e
+          curl -L -o ffmpeg.tar.gz https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n6.1.1.tar.gz
+          tar xf ffmpeg.tar.gz
+
+      - name: Configure
+        working-directory: FFmpeg-n6.1.1
+        run: |
+          set -e
+          SDK=$(xcrun -sdk iphoneos --show-sdk-path)
+          ./configure \
+            --prefix="$PWD/out" \
+            --enable-cross-compile --arch=arm64 --target-os=darwin \
+            --cc="xcrun -sdk iphoneos clang" \
+            --extra-cflags="-arch arm64 -miphoneos-version-min=15.0 -isysroot $SDK" \
+            --extra-ldflags="-arch arm64 -isysroot $SDK" \
+            --disable-everything \
+            --enable-decoder=aac --enable-parser=aac --enable-demuxer=flv \
+            --enable-protocol=file --enable-protocol=http --enable-protocol=https --enable-network \
+            --disable-programs --disable-doc --disable-avdevice --disable-swscale \
+            --disable-postproc --disable-avfilter --disable-encoders --disable-muxers \
+            --disable-shared --enable-static
+
+      - name: Make
+        working-directory: FFmpeg-n6.1.1
+        run: make -j$(sysctl -n hw.ncpu)
+
+      - name: Install and pack
+        working-directory: FFmpeg-n6.1.1
+        run: |
+          set -e
+          make install
+          cd out
+          ls -la lib
+          zip -r "$GITHUB_WORKSPACE/ffmpeg-ios.zip" lib include
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-ios
+          path: ffmpeg-ios.zip
+          retention-days: 14
