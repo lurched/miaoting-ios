@@ -1,15 +1,31 @@
 import AVFoundation
 import AudioToolbox
 
-/// 把裸 AAC 帧解码成 PCM。
+/// 裸 AAC 帧 → PCM。
 ///
-/// 用 `AudioConverterConvertBuffer`（同步、一次一包），而不是
-/// `AudioConverterFillComplexBuffer`（要自己实现 VBR 输入回调，字段错一个就整片失败）。
-/// 输出是非交错 float32，方便上层直接做增益。
+/// 两个关键点（都踩过坑）：
+/// 1. AAC 是 VBR，`inputProc` 必须通过 `outDataPacketDescription` 告诉解码器每包多大；
+/// 2. `AudioConverterFillComplexBuffer` 的最后一个参数是**输出**描述，对 PCM 要传 nil。
+///    之前误传了输入描述的指针，等于把刚写进去的输入描述覆盖成垃圾，于是每帧都失败（dec=0）。
+///
+/// 另外 `AudioConverterConvertBuffer` 只支持 PCM→PCM，不能用来解 AAC，那条路是死的。
 final class AACDecoder {
 
     private var converter: AudioConverterRef?
     private var configuredASC: Data?
+
+    private final class Feed {
+        var nsPacket: NSData = NSData()
+        var consumed = true
+        var packetDescription = AudioStreamPacketDescription()
+        let descPointer = UnsafeMutablePointer<AudioStreamPacketDescription>.allocate(capacity: 1)
+
+        deinit {
+            descPointer.deallocate()
+        }
+    }
+
+    private let feed = Feed()
 
     private(set) var sampleRate: Double = 44100
     private(set) var channelCount: AVAudioChannelCount = 2
@@ -65,26 +81,58 @@ final class AACDecoder {
         return true
     }
 
-    /// 解一帧，返回非交错 float32 PCM。
     func decode(packet: Data) -> AVAudioPCMBuffer? {
-        guard let converter, let pcmFormat else { return nil }
-        guard !packet.isEmpty else { return nil }
+        guard let converter, let pcmFormat, !packet.isEmpty else { return nil }
+
+        feed.nsPacket = packet as NSData
+        feed.consumed = false
+        feed.packetDescription = AudioStreamPacketDescription(
+            mStartOffset: 0,
+            mVariableFramesInPacket: 0,
+            mDataByteSize: UInt32(packet.count)
+        )
+        feed.descPointer.pointee = feed.packetDescription
+
         guard let out = AVAudioPCMBuffer(pcmFormat: pcmFormat, frameCapacity: 2048) else { return nil }
+        var frameCount = UInt32(out.frameCapacity)
 
-        var outputBytes = UInt32(out.frameCapacity) * 4 * UInt32(pcmFormat.channelCount)
-        let status = packet.withUnsafeBytes { raw -> OSStatus in
-            guard let base = raw.baseAddress else { return -1 }
-            return AudioConverterConvertBuffer(converter,
-                                               UInt32(packet.count),
-                                               base,
-                                               &outputBytes,
-                                               out.mutableAudioBufferList)
-        }
-        guard status == noErr, outputBytes > 0 else { return nil }
-
-        let frames = outputBytes / (4 * UInt32(pcmFormat.channelCount))
-        guard frames > 0 else { return nil }
-        out.frameLength = frames
+        let status = AudioConverterFillComplexBuffer(
+            converter,
+            Self.inputProc,
+            Unmanaged.passUnretained(feed).toOpaque(),
+            &frameCount,
+            out.mutableAudioBufferList,
+            nil                    // ← 输出描述，PCM 不需要；传指针会覆盖输入描述
+        )
+        guard status == noErr, frameCount > 0 else { return nil }
+        out.frameLength = frameCount
         return out
+    }
+
+    private static let inputProc: AudioConverterComplexInputDataProc = {
+        _, ioNumberDataPackets, ioData, outPacketDescription, inUserData in
+        guard let inUserData else {
+            ioNumberDataPackets.pointee = 0
+            return noErr
+        }
+        let feed = Unmanaged<Feed>.fromOpaque(inUserData).takeUnretainedValue()
+        guard !feed.consumed, feed.nsPacket.length > 0 else {
+            ioNumberDataPackets.pointee = 0
+            return noErr
+        }
+
+        let length = feed.nsPacket.length
+        ioNumberDataPackets.pointee = 1
+        ioData.pointee.mNumberBuffers = 1
+        ioData.pointee.mBuffers.mNumberChannels = 1
+        ioData.pointee.mBuffers.mDataByteSize = UInt32(length)
+        ioData.pointee.mBuffers.mData = UnsafeMutableRawPointer(mutating: feed.nsPacket.bytes)
+
+        if let outPacketDescription {
+            outPacketDescription.pointee = feed.descPointer
+        }
+
+        feed.consumed = true
+        return noErr
     }
 }
