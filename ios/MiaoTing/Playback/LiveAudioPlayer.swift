@@ -58,6 +58,10 @@ final class LiveAudioPlayer {
     private var sampleRate: Double = 44100
     private var generation = 0
     private var isRunning = false
+    /// 已收到的 PCM buffer 数，诊断用。
+    private(set) var receivedBuffers = 0
+    /// 引擎当前是否在跑，诊断用。
+    var engineRunning: Bool { engine.isRunning }
     private var state: State = .idle {
         didSet {
             guard state != oldValue else { return }
@@ -112,6 +116,7 @@ final class LiveAudioPlayer {
             }
 
             self.pendingFrames += Double(buffer.frameLength)
+            self.receivedBuffers += 1
             let gen = self.generation
             self.player.scheduleBuffer(buffer, completionCallbackType: .dataRendered) { [weak self] _ in
                 guard let self else { return }
@@ -160,7 +165,16 @@ final class LiveAudioPlayer {
 
     private func startPlaybackLocked() {
         if !engine.isRunning {
-            try? engine.start()
+            do {
+                try engine.start()
+            } catch {
+                state = .failed("音频引擎启动失败：\(error.localizedDescription)")
+                return
+            }
+        }
+        guard engine.isRunning else {
+            state = .failed("音频引擎未运行（可能被系统占用）")
+            return
         }
         player.play()
         isRunning = true
