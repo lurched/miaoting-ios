@@ -16,7 +16,8 @@ final class FLVStreamLoader: NSObject {
     private var responseChecked = false
     private var finished = false
 
-    static let mobileUA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+    /// 与 Android 端 `Lq` 拉流时用的 UA 完全一致。
+    static let mobileUA = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Mobile Safari/537.36"
 
     func start(url: URL, referer: String?) {
         cancel()
