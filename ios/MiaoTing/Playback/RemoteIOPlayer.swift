@@ -203,7 +203,7 @@ final class RemoteIOPlayer {
         readIndex = 0
         lock.unlock()
 
-        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.2) {
+        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 1.0) {
             AudioOutputUnitStop(unit)
             AudioUnitUninitialize(unit)
             AudioComponentInstanceDispose(unit)
