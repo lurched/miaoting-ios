@@ -1,4 +1,6 @@
 import SwiftUI
+import MediaPlayer
+import UIKit
 
 /// 直播间状态圆环，对应 Android 端 `LN`（自定义 View 的 onDraw）。
 ///
@@ -135,4 +137,18 @@ struct ToastView: View {
             .background(Color.black.opacity(0.85), in: Capsule())
             .overlay(Capsule().stroke(Theme.border, lineWidth: 1))
     }
+}
+
+
+/// 系统音量滑块。iOS 上 App 无法把音量推到系统媒体音量之上，
+/// 所以「声音小」先要能确认是不是媒体音量没拉满。
+struct SystemVolumeSlider: UIViewRepresentable {
+    func makeUIView(context: Context) -> MPVolumeView {
+        let view = MPVolumeView()
+        view.showsRouteButton = false
+        view.tintColor = UIColor(Theme.accent)
+        return view
+    }
+
+    func updateUIView(_ uiView: MPVolumeView, context: Context) {}
 }
