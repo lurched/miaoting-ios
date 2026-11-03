@@ -14,13 +14,36 @@ final class WebPageLoader: NSObject {
     static let shared = WebPageLoader()
 
     private var webView: WKWebView?
-    private var continuation: CheckedContinuation<(html: String, finalURL: URL?)?, Never>?
+    private var continuation: CheckedContinuation<(html: String, finalURL: URL?, captured: [String])?, Never>?
     private var settled = false
+    private var captured: [String] = []
+
+    /// 注入到页面里的探针：抖音的直播流地址是播放器用 XHR/fetch 拉的，
+    /// 不在 SSR 的 HTML 里。这里把请求过的 URL 都回传给原生。
+    private static let probeJS = """
+    (function(){
+      if (window.__mtHooked) return; window.__mtHooked = true;
+      function send(u){ try { window.webkit.messageHandlers.mtCapture.postMessage(String(u)); } catch(e){} }
+      var open = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function(m, u){ send(u); return open.apply(this, arguments); };
+      if (window.fetch) {
+        var f = window.fetch;
+        window.fetch = function(i){ try { send(i && i.url ? i.url : i); } catch(e){} return f.apply(this, arguments); };
+      }
+      var desc = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'src');
+      if (desc && desc.set) {
+        Object.defineProperty(HTMLMediaElement.prototype, 'src', {
+          set: function(v){ send(v); return desc.set.call(this, v); },
+          get: desc.get, configurable: true
+        });
+      }
+    })();
+    """
 
     private static let safariUA =
         "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
 
-    func load(_ url: URL, timeout: TimeInterval = 18) async -> (html: String, finalURL: URL?)? {
+    func load(_ url: URL, timeout: TimeInterval = 18) async -> (html: String, finalURL: URL?, captured: [String])? {
         teardown()
 
         guard let host = UIApplication.shared.connectedScenes
@@ -33,6 +56,14 @@ final class WebPageLoader: NSObject {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+        captured = []
+
+        let controller = WKUserContentController()
+        controller.addUserScript(WKUserScript(source: Self.probeJS,
+                                              injectionTime: .atDocumentStart,
+                                              forMainFrameOnly: false))
+        controller.add(self, name: "mtCapture")
+        configuration.userContentController = controller
 
         let web = WKWebView(frame: CGRect(x: 0, y: 0, width: 1, height: 1), configuration: configuration)
         web.customUserAgent = Self.safariUA
@@ -42,7 +73,7 @@ final class WebPageLoader: NSObject {
         host.addSubview(web)
         webView = web
 
-        let result: (html: String, finalURL: URL?)? = await withCheckedContinuation { continuation in
+        let result: (html: String, finalURL: URL?, captured: [String])? = await withCheckedContinuation { continuation in
             self.continuation = continuation
             self.settled = false
 
@@ -58,7 +89,7 @@ final class WebPageLoader: NSObject {
         return result
     }
 
-    private func finish(_ value: (html: String, finalURL: URL?)?) {
+    private func finish(_ value: (html: String, finalURL: URL?, captured: [String])?) {
         guard !settled else { return }
         settled = true
         let continuation = self.continuation
@@ -85,8 +116,20 @@ final class WebPageLoader: NSObject {
             guard let self else { return }
             let html = (result as? String) ?? ""
             Task { @MainActor in
-                self.finish((html: html, finalURL: finalURL))
+                // 再给播放器一点时间发请求
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+                self.finish((html: html, finalURL: finalURL, captured: self.captured))
             }
+        }
+    }
+}
+
+extension WebPageLoader: WKScriptMessageHandler {
+    nonisolated func userContentController(_ userContentController: WKUserContentController,
+                                           didReceive message: WKScriptMessage) {
+        guard let text = message.body as? String else { return }
+        Task { @MainActor in
+            if self.captured.count < 200 { self.captured.append(text) }
         }
     }
 }
