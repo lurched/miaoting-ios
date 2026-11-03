@@ -202,12 +202,8 @@ final class PlaybackController {
     private func playHLS(_ url: URL) {
         configureAudioSession()
 
-        let asset = AVURLAsset(url: url, options: [
-            "AVURLAssetHTTPHeaderFieldsKey": [
-                "User-Agent": FLVStreamLoader.mobileUA,
-                "Referer": Self.referer(for: url) ?? ""
-            ]
-        ])
+        // 实测抖音的 m3u8 不校验 Referer/UA，直接给 AVURLAsset 就行
+        let asset = AVURLAsset(url: url)
         let item = AVPlayerItem(asset: asset)
         item.preferredForwardBufferDuration = 2
         let av = AVPlayer(playerItem: item)
