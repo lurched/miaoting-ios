@@ -279,6 +279,21 @@ struct ListenView: View {
             SystemVolumeSlider()
                 .frame(height: 32)
 
+            HStack(spacing: 8) {
+                Text("增强")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.textSecondary)
+                Slider(value: Binding(
+                    get: { Double(state.gain) },
+                    set: { state.setGain(Float($0)) }
+                ), in: 1.0...4.0)
+                .tint(Theme.accent)
+                Text(String(format: "%.1fx", state.gain))
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundStyle(Theme.accent)
+                    .frame(width: 44, alignment: .trailing)
+            }
+
         }
         .padding(12)
         .background(Color(red: 14 / 255, green: 16 / 255, blue: 21 / 255),
