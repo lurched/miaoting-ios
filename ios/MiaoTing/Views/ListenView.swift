@@ -74,6 +74,27 @@ struct ListenView: View {
 
     private var statusCard: some View {
         VStack(spacing: 10) {
+            HStack {
+                Spacer()
+                if state.isPlaying || !state.roomTitle.isEmpty {
+                    Button {
+                        Task { await state.addCurrentRoom() }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "plus")
+                            Text("添加")
+                        }
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Theme.surfaceHigh, in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.top, 8)
             PulseIndicator(playing: state.isPlaying,
                            badge: badgeText,
                            tint: state.isPlaying ? Theme.accent : Theme.textSecondary)
@@ -257,6 +278,21 @@ struct ListenView: View {
             }
             SystemVolumeSlider()
                 .frame(height: 32)
+
+            HStack(spacing: 8) {
+                Text("增强")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.textSecondary)
+                Slider(value: Binding(
+                    get: { Double(state.gain) },
+                    set: { state.setGain(Float($0)) }
+                ), in: 0.5...3.0)
+                .tint(Theme.accent)
+                Text(String(format: "%.1fx", state.gain))
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundStyle(Theme.accent)
+                    .frame(width: 44, alignment: .trailing)
+            }
         }
         .padding(12)
         .background(Color(red: 14 / 255, green: 16 / 255, blue: 21 / 255),
