@@ -52,6 +52,7 @@ final class AppState: ObservableObject {
     @Published private(set) var statusText: String = "未播放"
     @Published private(set) var isPlaying = false
     @Published var speed: Float = 1.0
+    @Published var gain: Float = 2.2
     @Published var preservesPitch = true
 
     // 反馈
@@ -386,6 +387,7 @@ final class AppState: ObservableObject {
         roomTitle = title
         platformName = platform
         playback.speed = speed
+        playback.gain = gain
         playback.preservesPitch = preservesPitch
         playback.play(url: streamURL, title: title)
         statusText = "正在连接直播音频 \(String(format: "%.1f", speed))x"
@@ -403,9 +405,18 @@ final class AppState: ObservableObject {
         if isPlaying { stop() } else { resolveAndPlay() }
     }
 
+    func setGain(_ value: Float) {
+        gain = value
+        playback.gain = value
+    }
+
     func setSpeed(_ value: Float) {
         speed = value
         playback.speed = value
+        // FLV + RemoteIO 这条链路是直出 PCM，没有重采样，暂时只支持 1x
+        if isPlaying, abs(value - 1.0) > 0.01 {
+            toast = "FLV 直连模式暂不支持变速，HLS 模式可用"
+        }
         if isPlaying { statusText = "正在播放 \(String(format: "%.1f", value))x" }
     }
 
