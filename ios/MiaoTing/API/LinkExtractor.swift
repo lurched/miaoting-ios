@@ -9,7 +9,9 @@ enum LinkExtractor {
 
     private static let platformHosts = [
         "douyin.com", "kuaishou.com", "xiaohongshu.com",
-        "xhslink.com", "tbzb.taobao.com"
+        "xhslink.com", "tbzb.taobao.com",
+        // 抖音短链最终会落到 webcast.amemv.com 的 reflow 页，这一页里直接有 flv
+        "amemv.com"
     ]
 
     // MARK: - URL 抽取
