@@ -72,6 +72,9 @@ final class FLVAudioQueuePlayer {
             return false
         }
 
+        // 音量拉到 1.0（这是 AudioQueue 的上限；再大就要在 PCM 上做增益了）
+        AudioQueueSetParameter(newQueue, kAudioQueueParam_Volume, 1.0)
+
         let startStatus = AudioQueueStart(newQueue, nil)
         guard startStatus == noErr else {
             AudioQueueDispose(newQueue, false)
