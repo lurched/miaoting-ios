@@ -135,6 +135,36 @@ final class LiveAudioPlayer {
 
     // MARK: - 内部
 
+    /// 播一段 440Hz 正弦波，用来判断问题出在音频栈还是数据链路。
+    func playTestTone() {
+        queue.async { [weak self] in
+            guard let self else { return }
+            let sampleRate = 44100.0
+            guard let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1) else {
+                self.state = .failed("无法创建测试音频格式")
+                return
+            }
+            self.ensureGraphLocked(format: format)
+            do {
+                try self.engine.start()
+            } catch {
+                self.state = .failed("测试音引擎启动失败：\(error.localizedDescription)")
+                return
+            }
+            guard let buffer = AVAudioPCMBuffer(pcmFormat: format,
+                                                frameCapacity: AVAudioFrameCount(sampleRate)) else { return }
+            buffer.frameLength = AVAudioFrameCount(sampleRate)
+            if let channel = buffer.floatChannelData?[0] {
+                for i in 0..<Int(sampleRate) {
+                    channel[i] = Float(sin(2 * Double.pi * 440 * Double(i) / sampleRate)) * 0.2
+                }
+            }
+            self.player.scheduleBuffer(buffer, at: nil, options: [], completionHandler: nil)
+            self.player.play()
+            self.state = .playing
+        }
+    }
+
     private func ensureGraphLocked(format: AVAudioFormat) {
         if let connectedFormat, connectedFormat.sampleRate == format.sampleRate,
            connectedFormat.channelCount == format.channelCount {
