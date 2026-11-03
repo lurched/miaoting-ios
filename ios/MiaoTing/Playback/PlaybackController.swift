@@ -243,6 +243,6 @@ final class PlaybackController {
             return "https://www.xiaohongshu.com/"
         }
         if host == "tbzb.taobao.com" { return "https://tbzb.taobao.com/" }
-        return "https://live.douyin.com/"
+        return "https://www.douyin.com/"
     }
 }
