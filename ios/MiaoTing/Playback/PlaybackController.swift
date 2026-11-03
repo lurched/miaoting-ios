@@ -40,17 +40,15 @@ final class PlaybackController {
 
     var speed: Float = 1.3 {
         didSet {
-            player.speed = speed
+            audioPlayer.setRate(speed)
             avPlayer?.rate = speed
         }
     }
-    var preservesPitch: Bool = true {
-        didSet { player.preservesPitch = preservesPitch }
-    }
+    /// AudioQueue 的变速是变调的（和 Android 的线性插值重采样一致），保留这个开关只为接口兼容。
+    var preservesPitch: Bool = true
 
     private let demuxer = FLVDemuxer()
-    private let decoder = AACDecoder()
-    private let player = LiveAudioPlayer()
+    private let audioPlayer = FLVAudioQueuePlayer()
     private var loader: FLVStreamLoader?
     private var avPlayer: AVPlayer?
     private var itemStatusObservation: NSKeyValueObservation?
@@ -60,30 +58,18 @@ final class PlaybackController {
     private(set) var activeStreamURL: String = ""
     /// 已收到的字节数 / AAC 帧数 / PCM buffer 数，诊断用。
     private(set) var bytesReceived = 0
-    private(set) var packetsDecoded = 0
 
     private(set) var configCalls = 0
     private(set) var packetCalls = 0
-    private(set) var decodeFails = 0
 
     var diagnosticsLine: String {
         let d = demuxer
-        return "bytes=\(bytesReceived) tags=\(d.tagsSeen) audio=\(d.audioTagsSeen) aac=\(d.aacTagsSeen) cfg=\(configCalls) pkt=\(packetCalls) dec=\(packetsDecoded) fail=\(decodeFails) eng=\(player.engineRunning ? "on" : "off")"
+        return "bytes=\(bytesReceived) tags=\(d.tagsSeen) aac=\(d.aacTagsSeen) cfg=\(configCalls) pkt=\(packetCalls) queued=\(audioPlayer.enqueued) playing=\(audioPlayer.started ? "on" : "off")"
     }
 
     private init() {
-        player.onStateChange = { [weak self] state in
-            guard let self else { return }
-            switch state {
-            case .playing:
-                if self.status != .playing { self.status = .playing }
-            case .failed(let m):
-                self.status = .failed(m)
-            case .buffering:
-                if self.status == .idle || self.status == .preparing { self.status = .preparing }
-            case .idle:
-                break
-            }
+        audioPlayer.onError = { [weak self] message in
+            self?.status = .failed(message)
         }
         configureDemuxer()
     }
@@ -92,26 +78,18 @@ final class PlaybackController {
         demuxer.onConfig = { [weak self] config in
             guard let self else { return }
             self.configCalls += 1
-            guard self.decoder.configure(config) else {
-                self.status = .failed("音频参数不支持：\(config.sampleRate)Hz/\(config.channels)ch")
-                return
-            }
-            self.player.speed = self.speed
-            self.player.preservesPitch = self.preservesPitch
-            self.player.start()
-            self.status = .preparing
+            guard self.audioPlayer.configure(asc: config.asc,
+                                             sampleRate: Double(config.sampleRate),
+                                             channels: UInt32(config.channels)) else { return }
+            self.audioPlayer.setRate(self.speed)
+            self.cancelWatchdog()
+            self.status = .playing
         }
 
         demuxer.onPacket = { [weak self] packet, _ in
             guard let self else { return }
-            self.cancelWatchdog()
             self.packetCalls += 1
-            if let buffer = self.decoder.decode(packet: packet) {
-                self.packetsDecoded += 1
-                self.player.enqueue(buffer)
-            } else {
-                self.decodeFails += 1
-            }
+            self.audioPlayer.enqueue(packet)
         }
 
         demuxer.onInvalidStream = { [weak self] in
@@ -152,7 +130,7 @@ final class PlaybackController {
         loader?.cancel()
         loader = nil
         demuxer.reset()
-        player.stop()
+        audioPlayer.stop()
         teardownAVPlayer()
         // 保留 currentURL：锁屏 / 界面上的“继续播放”要靠它重连
         status = .idle
@@ -229,8 +207,7 @@ final class PlaybackController {
 
     /// 12 秒内没收到任何音频帧就判超时，避免界面永远停在「正在连接」。
     func playTestTone() {
-        configureAudioSession()
-        player.playTestTone()
+        // AudioQueue 版本不再提供测试音，保留接口避免界面报错
     }
 
     private func startWatchdog(seconds: TimeInterval = 12) {
