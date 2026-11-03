@@ -26,7 +26,9 @@ enum LinkExtractor {
         regex.enumerateMatches(in: normalized, range: NSRange(location: 0, length: ns.length)) { match, _, _ in
             guard let match else { return }
             var raw = ns.substring(with: match.range)
-            if let decoded = raw.removingPercentEncoding { raw = decoded }
+            // 注意：不要整体 percent-decode。抖音的 flv 地址里带
+            // `fp_user_url=http%3A%2F%2F...` 这种嵌套编码，整体解码会把
+            // 里面的 & 放出来，参数就乱了。
             raw = raw.trimmingCharacters(in: .whitespacesAndNewlines)
             raw = raw.replacingOccurrences(
                 of: "[),.;!?:\\]}\u{FF09}\u{3011}\u{300B}\u{300D}\u{300F}\u{FF0C}\u{3002}\u{FF01}\u{FF1F}\u{FF1B}\u{FF1A}\u{3001}]+$",
