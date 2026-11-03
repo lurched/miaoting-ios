@@ -58,6 +58,13 @@ final class PlaybackController {
     private var watchdog: DispatchWorkItem?
     /// 实际在播/正在连的地址，诊断面板用。
     private(set) var activeStreamURL: String = ""
+    /// 已收到的字节数 / AAC 帧数 / PCM buffer 数，诊断用。
+    private(set) var bytesReceived = 0
+    private(set) var packetsDecoded = 0
+
+    var diagnosticsLine: String {
+        "bytes=\(bytesReceived) packets=\(packetsDecoded) buffers=\(player.receivedBuffers) engine=\(player.engineRunning ? "on" : "off")"
+    }
 
     private init() {
         player.onStateChange = { [weak self] state in
@@ -93,6 +100,7 @@ final class PlaybackController {
             guard let self else { return }
             self.cancelWatchdog()          // 收到第一帧就算连接成功
             if let buffer = self.decoder.decode(packet: packet) {
+                self.packetsDecoded += 1
                 self.player.enqueue(buffer)
             }
         }
@@ -163,7 +171,9 @@ final class PlaybackController {
         let loader = FLVStreamLoader()
         self.loader = loader
         loader.onData = { [weak self] data in
-            self?.demuxer.append(data)
+            guard let self else { return }
+            self.bytesReceived += data.count
+            self.demuxer.append(data)
         }
         loader.onFinished = { [weak self] error in
             guard let self else { return }
