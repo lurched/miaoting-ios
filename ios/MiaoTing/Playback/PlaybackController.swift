@@ -104,8 +104,18 @@ final class PlaybackController {
 
     // MARK: - 控制
 
+    /// 抖音 CDN 的 flv 加上 `only_audio=1` 才会只推音频轨，
+    /// 抓包里安卓端就是这么请求的；HTML 里的原始地址没有这个参数。
+    static func audioOnlyVariant(_ url: URL) -> URL {
+        let text = url.absoluteString
+        guard text.contains("douyincdn.com"), !text.lowercased().contains("only_audio=1") else { return url }
+        let separator = text.contains("?") ? "&" : "?"
+        return URL(string: text + separator + "only_audio=1") ?? url
+    }
+
     func play(url: URL, title: String) {
         stop()
+        let url = Self.audioOnlyVariant(url)
         currentURL = url
         currentTitle = title
         activeStreamURL = url.absoluteString
@@ -243,6 +253,6 @@ final class PlaybackController {
             return "https://www.xiaohongshu.com/"
         }
         if host == "tbzb.taobao.com" { return "https://tbzb.taobao.com/" }
-        return "https://www.douyin.com/"
+        return "https://live.douyin.com/"
     }
 }
