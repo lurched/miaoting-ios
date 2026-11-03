@@ -51,9 +51,16 @@ enum CandidateRanker {
         return 0
     }
 
-    /// 排序 + 择优：先按分数降序，再按「only_audio → _orig.flv → 任意 flv → hls」的偏好取第一条。
+    /// 排序 + 择优。
+    ///
+    /// 和 Android 不同：**HLS 优先**。
+    /// Android 用 MediaCodec 自己解 FLV 里的 AAC，很稳；
+    /// iOS 只能靠 AudioConverter，裸 AAC 喂进去很容易整片失败。
+    /// 而抖音同时提供 m3u8（我实测过，200 + 标准 HLS 列表，且不需要 Referer），
+    /// 交给系统 AVPlayer 播是最稳的。
     static func best(from candidates: [StreamCandidate]) -> StreamCandidate? {
         let playable = candidates.filter { $0.playable && !$0.url.isEmpty }
+        if let hls = playable.first(where: { $0.protocolName == "hls" }) { return hls }
         let sorted = playable.sorted { score($0) > score($1) }
 
         if let c = sorted.first(where: { $0.protocolName == "http-flv" && $0.url.lowercased().contains("only_audio=1") }) {
