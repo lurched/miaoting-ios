@@ -52,6 +52,7 @@ final class AppState: ObservableObject {
     @Published private(set) var statusText: String = "未播放"
     @Published private(set) var isPlaying = false
     @Published var speed: Float = 1.0
+    @Published var gain: Float = 2.2
     @Published var preservesPitch = true
 
     // 反馈
@@ -229,6 +230,29 @@ final class AppState: ObservableObject {
         }
     }
 
+    /// 把当前正在播放的直播间加入「我的直播间」。
+    func addCurrentRoom() async {
+        guard isLoggedIn else { showLogin = true; return }
+        let raw = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !raw.isEmpty else {
+            toast = "还没有可添加的直播间"
+            return
+        }
+        let url = LinkExtractor.pickTarget(from: raw)
+        let name = roomTitle.isEmpty ? "直播间" : roomTitle
+        if rooms.contains(where: { $0.roomUrl == url }) {
+            toast = "已在我的直播间里"
+            return
+        }
+        do {
+            try await api.addRoom(name: name, roomUrl: url)
+            await refreshRooms()
+            toast = "已加入我的直播间。"
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     func addRoom(name: String, url: String) async throws {
         guard isLoggedIn else { showLogin = true; return }
         try await api.addRoom(name: name, roomUrl: url)
@@ -363,6 +387,7 @@ final class AppState: ObservableObject {
         roomTitle = title
         platformName = platform
         playback.speed = speed
+        playback.gain = gain
         playback.preservesPitch = preservesPitch
         playback.play(url: streamURL, title: title)
         statusText = "正在连接直播音频 \(String(format: "%.1f", speed))x"
@@ -378,6 +403,11 @@ final class AppState: ObservableObject {
 
     func togglePlay() {
         if isPlaying { stop() } else { resolveAndPlay() }
+    }
+
+    func setGain(_ value: Float) {
+        gain = value
+        playback.gain = value
     }
 
     func setSpeed(_ value: Float) {
