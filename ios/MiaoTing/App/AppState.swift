@@ -284,6 +284,21 @@ final class AppState: ObservableObject {
 
             statusText = "正在识别直播间"
             roomTitle = shareTitle
+
+            // webcast.amemv.com/.../reflow/xxx 是抖音短链的落地页，
+            // 页面上直接写着 flv 地址，不需要再问服务端（那边一律 403）。
+            if LinkExtractor.host(of: target).contains("amemv.com") {
+                let local = await LocalResolver.hunt(pageURL: target)
+                if !local.title.isEmpty { roomTitle = local.title }
+                if let best = CandidateRanker.best(from: local.candidates) {
+                    errorMessage = nil
+                    play(url: best.url, title: roomTitle, platform: "抖音")
+                    return
+                }
+                errorMessage = "直播间暂未开播。"
+                return
+            }
+
             input = target
 
             // 1) 服务端识别。失败原因先记下来，不要立刻弹给用户——
