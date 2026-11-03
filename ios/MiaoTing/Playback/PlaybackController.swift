@@ -62,8 +62,13 @@ final class PlaybackController {
     private(set) var bytesReceived = 0
     private(set) var packetsDecoded = 0
 
+    private(set) var configCalls = 0
+    private(set) var packetCalls = 0
+    private(set) var decodeFails = 0
+
     var diagnosticsLine: String {
-        "bytes=\(bytesReceived) packets=\(packetsDecoded) buffers=\(player.receivedBuffers) engine=\(player.engineRunning ? "on" : "off")"
+        let d = demuxer
+        return "bytes=\(bytesReceived) tags=\(d.tagsSeen) audio=\(d.audioTagsSeen) aac=\(d.aacTagsSeen) cfg=\(configCalls) pkt=\(packetCalls) dec=\(packetsDecoded) fail=\(decodeFails) eng=\(player.engineRunning ? "on" : "off")"
     }
 
     private init() {
@@ -86,6 +91,7 @@ final class PlaybackController {
     private func configureDemuxer() {
         demuxer.onConfig = { [weak self] config in
             guard let self else { return }
+            self.configCalls += 1
             guard self.decoder.configure(config) else {
                 self.status = .failed("音频参数不支持：\(config.sampleRate)Hz/\(config.channels)ch")
                 return
@@ -98,10 +104,13 @@ final class PlaybackController {
 
         demuxer.onPacket = { [weak self] packet, _ in
             guard let self else { return }
-            self.cancelWatchdog()          // 收到第一帧就算连接成功
+            self.cancelWatchdog()
+            self.packetCalls += 1
             if let buffer = self.decoder.decode(packet: packet) {
                 self.packetsDecoded += 1
                 self.player.enqueue(buffer)
+            } else {
+                self.decodeFails += 1
             }
         }
 
