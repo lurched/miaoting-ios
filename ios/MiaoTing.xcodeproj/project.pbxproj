@@ -12,6 +12,7 @@
 		BCF6E248FC3B6C2A45E7DA5D /* LinkExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA3BE30F7E9634790DCBA99 /* LinkExtractor.swift */; };
 		FC9AB9F4975593A44D514690 /* LocalResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0F2E8170B420C212F09383 /* LocalResolver.swift */; };
 		1D77DFE0689BBC63EE249CA0 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7CCA7A867826C7244EC6BE /* Models.swift */; };
+		214156E2940A5F9045D92EA5 /* WebPageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0EBF19494533D7532024F7 /* WebPageLoader.swift */; };
 		9BF5C2E15E2D753C68CEE94D /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECBBF00080A17069A707F1B3 /* AppState.swift */; };
 		5E869F4035398F95C2CEF1D7 /* MiaoTingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20543F0383AE67D70857DD5 /* MiaoTingApp.swift */; };
 		02EAA2D19182F6AC835B7CD5 /* AACDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC6A95A91B92906580F0E3FF /* AACDecoder.swift */; };
@@ -42,6 +43,7 @@
 		0EA3BE30F7E9634790DCBA99 /* LinkExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkExtractor.swift; sourceTree = "<group>"; };
 		AB0F2E8170B420C212F09383 /* LocalResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalResolver.swift; sourceTree = "<group>"; };
 		7A7CCA7A867826C7244EC6BE /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		3E0EBF19494533D7532024F7 /* WebPageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPageLoader.swift; sourceTree = "<group>"; };
 		ECBBF00080A17069A707F1B3 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		C20543F0383AE67D70857DD5 /* MiaoTingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiaoTingApp.swift; sourceTree = "<group>"; };
 		CC6A95A91B92906580F0E3FF /* AACDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AACDecoder.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 				0EA3BE30F7E9634790DCBA99 /* LinkExtractor.swift */,
 				AB0F2E8170B420C212F09383 /* LocalResolver.swift */,
 				7A7CCA7A867826C7244EC6BE /* Models.swift */,
+				3E0EBF19494533D7532024F7 /* WebPageLoader.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -235,6 +238,7 @@
 				BCF6E248FC3B6C2A45E7DA5D /* LinkExtractor.swift in Sources */,
 				FC9AB9F4975593A44D514690 /* LocalResolver.swift in Sources */,
 				1D77DFE0689BBC63EE249CA0 /* Models.swift in Sources */,
+				214156E2940A5F9045D92EA5 /* WebPageLoader.swift in Sources */,
 				9BF5C2E15E2D753C68CEE94D /* AppState.swift in Sources */,
 				5E869F4035398F95C2CEF1D7 /* MiaoTingApp.swift in Sources */,
 				02EAA2D19182F6AC835B7CD5 /* AACDecoder.swift in Sources */,
