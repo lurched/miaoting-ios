@@ -22,7 +22,18 @@ enum LocalResolver {
         var title = ""
 
         for url in candidatePageURLs(pageURL) {
-            guard let page = await fetch(url) else { continue }
+            var loaded: (html: String, finalURL: String)?
+
+            // 抖音短链必须走浏览器：302 目标依赖 JS 写入的 Cookie。
+            if LinkExtractor.host(of: url) == "v.douyin.com", let target = URL(string: url) {
+                if let page = await WebPageLoader.shared.load(target) {
+                    loaded = (page.html, page.finalURL?.absoluteString ?? url)
+                }
+            } else {
+                loaded = await fetch(url)
+            }
+
+            guard let page = loaded else { continue }
 
             var list = extractCandidates(from: page.html)
             if let direct = LinkExtractor.xhsDirectURL(from: page.finalURL) {
