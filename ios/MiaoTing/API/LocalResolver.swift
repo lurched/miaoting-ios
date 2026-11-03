@@ -20,23 +20,27 @@ enum LocalResolver {
 
         var candidates: [StreamCandidate] = []
         var title = ""
+        var capturedURLs: [String] = []
 
         for url in candidatePageURLs(pageURL) {
             var loaded: (html: String, finalURL: String)?
 
-            // 先走普通 HTTP —— 短链正常情况下会直接 302 到 reflow 页。
-            loaded = await fetch(url)
-
-            // 拿不到候选时，再退到隐藏的 WKWebView 兜底（执行 JS 才能过的场景）。
-            if loaded == nil, LinkExtractor.host(of: url) == "v.douyin.com", let target = URL(string: url) {
+            // 抖音的直播流由播放器用 XHR 拉取，SSR 的 HTML 里只有小游戏推广流，
+            // 所以短链必须走一次真正的浏览器，并把播放器请求过的地址抓回来。
+            if LinkExtractor.host(of: url) == "v.douyin.com", let target = URL(string: url) {
                 if let page = await WebPageLoader.shared.load(target) {
                     loaded = (page.html, page.finalURL?.absoluteString ?? url)
+                    capturedURLs.append(contentsOf: page.captured)
                 }
+            } else {
+                loaded = await fetch(url)
             }
 
             guard let page = loaded else { continue }
 
             var list = extractCandidates(from: page.html)
+            // 页面里抓到的是播放器真正请求的地址，优先级最高
+            list.insert(contentsOf: extractCandidates(from: capturedURLs.joined(separator: "\n"), strict: true), at: 0)
             if let direct = LinkExtractor.xhsDirectURL(from: page.finalURL) {
                 list.insert(StreamCandidate(url: direct, protocolName: "http-flv", latencyTier: "unknown"), at: 0)
             }
@@ -88,7 +92,7 @@ enum LocalResolver {
 
     // MARK: - 抽取
 
-    static func extractCandidates(from html: String) -> [StreamCandidate] {
+    static func extractCandidates(from html: String, strict: Bool = false) -> [StreamCandidate] {
         var result: [StreamCandidate] = []
         // 优先从原文抽；只有抽不到时才尝试整体解码。
         // （抖音短链 302 到的 reflow 页面里 flv 地址是明文，整体解码反而会破坏参数）
@@ -98,6 +102,11 @@ enum LocalResolver {
         }
         for raw in urls {
             let lower = raw.lowercased()
+            // thirdgame 是直播间里挂的小游戏推广流，不是主播的声音，直接排除
+            if lower.contains("/thirdgame/") { continue }
+            if strict && !(lower.contains("pull-flv") || lower.contains("pull-hls") || lower.contains(".flv") || lower.contains(".m3u8")) {
+                continue
+            }
             if LinkExtractor.isFLV(raw) && lower.contains("only_audio=1") {
                 result.append(StreamCandidate(url: raw, protocolName: "http-flv", latencyTier: "unknown", playable: true))
             } else if lower.contains(".sdp") || lower.contains("pull-lls") {
