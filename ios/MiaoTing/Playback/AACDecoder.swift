@@ -5,14 +5,27 @@ import AudioToolbox
 ///
 /// Android 侧用 `MediaFormat.createAudioFormat + setByteBuffer("csd-0", asc)`，
 /// iOS 侧对应 `AudioConverter` + `kAudioConverterDecompressionMagicCookie`。
+///
+/// 关键点：AAC 是可变比特率，`AudioConverterFillComplexBuffer` 必须通过
+/// `outDataPacketDescription` 知道每个 packet 的字节数，否则解码会整片失败
+/// （表现为 pkt 涨、dec 一直是 0、fail 跟着涨）。
 final class AACDecoder {
 
     private var converter: AudioConverterRef?
     private var configuredASC: Data?
+
+    /// 回调要用的输入状态。`descPointer` 放堆上，保证在回调期间一直有效。
     private final class Feed {
         var nsPacket: NSData = NSData()
         var consumed = true
+        var packetDescription = AudioStreamPacketDescription()
+        let descPointer = UnsafeMutablePointer<AudioStreamPacketDescription>.allocate(capacity: 1)
+
+        deinit {
+            descPointer.deallocate()
+        }
     }
+
     private let feed = Feed()
 
     private(set) var sampleRate: Double = 44100
@@ -71,16 +84,24 @@ final class AACDecoder {
         return true
     }
 
-    /// 解码一个 AAC 帧。返回 nil 表示需要更多输入（或该帧无效）。
+    /// 解码一个 AAC 帧。返回 nil 表示这一帧无效或需要更多输入。
     func decode(packet: Data) -> AVAudioPCMBuffer? {
         guard let converter, let pcmFormat else { return nil }
+        guard !packet.isEmpty else { return nil }
 
         feed.nsPacket = packet as NSData
         feed.consumed = false
+        feed.packetDescription = AudioStreamPacketDescription(
+            mStartOffset: 0,
+            mDataByteSize: UInt32(packet.count),
+            mVariableFramesInPacket: 0
+        )
+        feed.descPointer.pointee = feed.packetDescription
 
         guard let outBuffer = AVAudioPCMBuffer(pcmFormat: pcmFormat, frameCapacity: 8192) else {
             return nil
         }
+
         var frameCount = UInt32(outBuffer.frameCapacity)
         let status = AudioConverterFillComplexBuffer(
             converter,
@@ -88,7 +109,7 @@ final class AACDecoder {
             Unmanaged.passUnretained(feed).toOpaque(),
             &frameCount,
             outBuffer.mutableAudioBufferList,
-            nil
+            feed.descPointer
         )
         guard status == noErr, frameCount > 0 else { return nil }
         outBuffer.frameLength = frameCount
@@ -98,7 +119,7 @@ final class AACDecoder {
     // MARK: - C 回调
 
     private static let inputProc: AudioConverterComplexInputDataProc = {
-        _, ioNumberDataPackets, ioData, _, inUserData in
+        _, ioNumberDataPackets, ioData, outPacketDescription, inUserData in
         guard let inUserData else {
             ioNumberDataPackets.pointee = 0
             return noErr
@@ -115,6 +136,11 @@ final class AACDecoder {
         ioData.pointee.mBuffers.mNumberChannels = 1
         ioData.pointee.mBuffers.mDataByteSize = UInt32(length)
         ioData.pointee.mBuffers.mData = UnsafeMutableRawPointer(mutating: feed.nsPacket.bytes)
+
+        if let outPacketDescription {
+            outPacketDescription.pointee = feed.descPointer
+        }
+
         feed.consumed = true
         return noErr
     }
