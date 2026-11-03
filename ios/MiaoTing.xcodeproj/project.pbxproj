@@ -22,6 +22,7 @@
 		AB4962BC825A3A0FD573F224 /* FLVStreamLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D5DEA7D49141B81616A6E1 /* FLVStreamLoader.swift */; };
 		933D90CFF41CA14262F81C5F /* LiveAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642D8D53E9E0EF74FA493D3 /* LiveAudioPlayer.swift */; };
 		F878225CE37229AB55C18D87 /* PlaybackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E56465C38BACB85E86C921F0 /* PlaybackController.swift */; };
+		63CBB8E44A955EF7810DF01C /* RemoteIOPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87C37BBE4316EB8B171A18E /* RemoteIOPlayer.swift */; };
 		B47C581521318D11299D3E49 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678EE5C90C558B1361961AEE /* Keychain.swift */; };
 		0DD068631DE4ECBECE18E1DF /* PatchFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5CA4A87A2071B50F0CB902 /* PatchFlags.swift */; };
 		68BF0ECD42A41AC09C519353 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E768A0CBDF4CD9844136929 /* AccountView.swift */; };
@@ -54,6 +55,7 @@
 		18D5DEA7D49141B81616A6E1 /* FLVStreamLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLVStreamLoader.swift; sourceTree = "<group>"; };
 		2642D8D53E9E0EF74FA493D3 /* LiveAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveAudioPlayer.swift; sourceTree = "<group>"; };
 		E56465C38BACB85E86C921F0 /* PlaybackController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackController.swift; sourceTree = "<group>"; };
+		B87C37BBE4316EB8B171A18E /* RemoteIOPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteIOPlayer.swift; sourceTree = "<group>"; };
 		678EE5C90C558B1361961AEE /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		7E5CA4A87A2071B50F0CB902 /* PatchFlags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatchFlags.swift; sourceTree = "<group>"; };
 		2E768A0CBDF4CD9844136929 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
@@ -131,6 +133,7 @@
 				18D5DEA7D49141B81616A6E1 /* FLVStreamLoader.swift */,
 				2642D8D53E9E0EF74FA493D3 /* LiveAudioPlayer.swift */,
 				E56465C38BACB85E86C921F0 /* PlaybackController.swift */,
+				B87C37BBE4316EB8B171A18E /* RemoteIOPlayer.swift */,
 			);
 			path = Playback;
 			sourceTree = "<group>";
@@ -251,6 +254,7 @@
 				AB4962BC825A3A0FD573F224 /* FLVStreamLoader.swift in Sources */,
 				933D90CFF41CA14262F81C5F /* LiveAudioPlayer.swift in Sources */,
 				F878225CE37229AB55C18D87 /* PlaybackController.swift in Sources */,
+				63CBB8E44A955EF7810DF01C /* RemoteIOPlayer.swift in Sources */,
 				B47C581521318D11299D3E49 /* Keychain.swift in Sources */,
 				0DD068631DE4ECBECE18E1DF /* PatchFlags.swift in Sources */,
 				68BF0ECD42A41AC09C519353 /* AccountView.swift in Sources */,
