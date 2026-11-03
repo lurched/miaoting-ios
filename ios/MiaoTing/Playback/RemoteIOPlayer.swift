@@ -153,7 +153,7 @@ final class RemoteIOPlayer {
     }
 
     private func render(frameCount: Int, ioData: UnsafeMutablePointer<AudioBufferList>?) -> OSStatus {
-        guard let ioData else { return noErr }
+        guard let ioData, let ring else { return noErr }
         let buffers = UnsafeMutableAudioBufferListPointer(ioData)
         guard !buffers.isEmpty else { return noErr }
 
@@ -170,7 +170,7 @@ final class RemoteIOPlayer {
             for c in 0..<channelCount {
                 guard c < buffers.count,
                       let dst = buffers[c].mData?.assumingMemoryBound(to: Float.self) else { continue }
-                var value = ring?[((readIndex + frame) % capacity) * channelCount + c] ?? 0
+                var value = ring[((readIndex + frame) % capacity) * channelCount + c]
                 value *= gain
                 dst[frame] = max(-1.0, min(1.0, value))
             }
@@ -191,13 +191,23 @@ final class RemoteIOPlayer {
     func stop() {
         guard let unit else { return }
         started = false
-        AudioOutputUnitStop(unit)
-        AudioUnitUninitialize(unit)
-        AudioComponentInstanceDispose(unit)
         self.unit = nil
-        if let ring {
-            ring.deallocate()
-            self.ring = nil
+
+        // AudioOutputUnitStop / Uninitialize / Dispose 都会等音频线程退出，
+        // 在 MainActor 上同步调用就是几百毫秒到几秒的界面假死（一键添加也会触发 stop）。
+        // 这里把它挪到后台，并延迟释放环形缓冲。
+        let oldRing = ring
+        ring = nil
+        lock.lock()
+        writeIndex = 0
+        readIndex = 0
+        lock.unlock()
+
+        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.2) {
+            AudioOutputUnitStop(unit)
+            AudioUnitUninitialize(unit)
+            AudioComponentInstanceDispose(unit)
+            oldRing?.deallocate()
         }
     }
 }
