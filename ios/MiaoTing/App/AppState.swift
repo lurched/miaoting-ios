@@ -232,6 +232,7 @@ final class AppState: ObservableObject {
 
     /// 把当前正在播放的直播间加入「我的直播间」。
     func addCurrentRoom() async {
+        guard !isBusy else { return }
         guard isLoggedIn else { showLogin = true; return }
         let raw = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !raw.isEmpty else {
@@ -244,6 +245,8 @@ final class AppState: ObservableObject {
             toast = "已在我的直播间里"
             return
         }
+        isBusy = true
+        defer { isBusy = false }
         do {
             try await api.addRoom(name: name, roomUrl: url)
             await refreshRooms()
