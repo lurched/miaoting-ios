@@ -39,16 +39,18 @@ final class PlaybackController {
     private(set) var currentTitle: String = ""
 
     var speed: Float = 1.0 {
-        didSet {
-            audioPlayer.setRate(speed)
-            avPlayer?.rate = speed
-        }
+        didSet { avPlayer?.rate = speed }
     }
-    /// AudioQueue 的变速是变调的，和 Android 一致；保留接口只为兼容。
+
+    /// 增益（RemoteIO 的 render 回调里乘），界面可调
+    var gain: Float = 2.2 {
+        didSet { rioPlayer.gain = gain }
+    }
     var preservesPitch: Bool = true
 
     private let demuxer = FLVDemuxer()
-    private let audioPlayer = FLVAudioQueuePlayer()
+    private let decoder = AACDecoder()
+    private let rioPlayer = RemoteIOPlayer()
     private var loader: FLVStreamLoader?
     private var avPlayer: AVPlayer?
     private var itemStatusObservation: NSKeyValueObservation?
@@ -61,14 +63,16 @@ final class PlaybackController {
 
     private(set) var configCalls = 0
     private(set) var packetCalls = 0
+    private(set) var decodedFrames = 0
+    private(set) var decodeFails = 0
 
     var diagnosticsLine: String {
         let d = demuxer
-        return "bytes=\(bytesReceived) tags=\(d.tagsSeen) aac=\(d.aacTagsSeen) cfg=\(configCalls) pkt=\(packetCalls) queued=\(audioPlayer.enqueued) fail=\(audioPlayer.enqueueFailures) playing=\(audioPlayer.started ? "on" : "off")"
+        return "bytes=\(bytesReceived) tags=\(d.tagsSeen) aac=\(d.aacTagsSeen) cfg=\(configCalls) pkt=\(packetCalls) dec=\(decodedFrames) fail=\(decodeFails) playing=\(rioPlayer.started ? "on" : "off")"
     }
 
     private init() {
-        audioPlayer.onError = { [weak self] message in
+        rioPlayer.onError = { [weak self] message in
             self?.status = .failed(message)
         }
         configureDemuxer()
@@ -78,10 +82,13 @@ final class PlaybackController {
         demuxer.onConfig = { [weak self] config in
             guard let self else { return }
             self.configCalls += 1
-            guard self.audioPlayer.configure(asc: config.asc,
-                                             sampleRate: Double(config.sampleRate),
-                                             channels: UInt32(config.channels)) else { return }
-            self.audioPlayer.setRate(self.speed)
+            guard self.decoder.configure(config) else {
+                self.status = .failed("音频参数不支持：\(config.sampleRate)Hz/\(config.channels)ch")
+                return
+            }
+            guard self.rioPlayer.configure(sampleRate: Double(config.sampleRate),
+                                           channels: UInt32(config.channels)) else { return }
+            self.rioPlayer.gain = self.gain
             self.cancelWatchdog()
             self.status = .playing
         }
@@ -89,7 +96,12 @@ final class PlaybackController {
         demuxer.onPacket = { [weak self] packet, _ in
             guard let self else { return }
             self.packetCalls += 1
-            self.audioPlayer.enqueue(packet)
+            if let buffer = self.decoder.decode(packet: packet) {
+                self.decodedFrames += 1
+                self.rioPlayer.enqueue(buffer)
+            } else {
+                self.decodeFails += 1
+            }
         }
 
         demuxer.onInvalidStream = { [weak self] in
@@ -130,7 +142,7 @@ final class PlaybackController {
         loader?.cancel()
         loader = nil
         demuxer.reset()
-        audioPlayer.stop()
+        rioPlayer.stop()
         teardownAVPlayer()
         // 保留 currentURL：锁屏 / 界面上的“继续播放”要靠它重连
         status = .idle
