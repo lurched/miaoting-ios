@@ -14,6 +14,7 @@ final class FLVAudioQueuePlayer {
     private var sampleRate: Double = 48000
     private var channels: UInt32 = 2
     private(set) var enqueued = 0
+    private(set) var enqueueFailures = 0
     private(set) var started = false
     /// 队列里还没播完的 buffer 数，用来判断要不要丢弃积压追直播。
     private var inFlight = 0
@@ -66,14 +67,14 @@ final class FLVAudioQueuePlayer {
                                                  &cookie,
                                                  UInt32(cookie.count))
         if cookieStatus != noErr {
-            AudioQueueDispose(newQueue, true)
+            AudioQueueDispose(newQueue, false)
             onError?("设置 magic cookie 失败：\(cookieStatus)")
             return false
         }
 
         let startStatus = AudioQueueStart(newQueue, nil)
         guard startStatus == noErr else {
-            AudioQueueDispose(newQueue, true)
+            AudioQueueDispose(newQueue, false)
             onError?("AudioQueueStart 失败：\(startStatus)")
             return false
         }
@@ -88,7 +89,7 @@ final class FLVAudioQueuePlayer {
         guard let queue, started, !frame.isEmpty else { return }
 
         // 积压太多直接丢，保证听到的是“现在”
-        if inFlight > 60 {
+        if inFlight > 120 {
             AudioQueueReset(queue)
             inFlight = 0
         }
@@ -103,6 +104,7 @@ final class FLVAudioQueuePlayer {
 
         guard AudioQueueEnqueueBuffer(queue, buffer, 0, nil) == noErr else {
             AudioQueueFreeBuffer(queue, buffer)
+            enqueueFailures += 1
             return
         }
         inFlight += 1
@@ -118,8 +120,10 @@ final class FLVAudioQueuePlayer {
     func stop() {
         guard let queue else { return }
         started = false
-        AudioQueueStop(queue, true)
-        AudioQueueDispose(queue, true)
+        // 第二个参数是 inImmediate：true 会同步等待队列排空，
+        // 在 MainActor 上调用就是几秒的界面卡死。这里一律用 false。
+        AudioQueueStop(queue, false)
+        AudioQueueDispose(queue, false)
         self.queue = nil
         inFlight = 0
     }
