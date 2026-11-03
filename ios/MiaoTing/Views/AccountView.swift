@@ -248,6 +248,10 @@ struct AccountView: View {
                 .foregroundStyle(Theme.accent)
                 .textSelection(.enabled)
                 .fixedSize(horizontal: false, vertical: true)
+            Text(state.diagnosticsLine)
+                .font(.system(size: 10, design: .monospaced))
+                .foregroundStyle(Theme.textSecondary)
+                .textSelection(.enabled)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
