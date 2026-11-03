@@ -38,7 +38,7 @@ final class PlaybackController {
     private(set) var currentURL: URL?
     private(set) var currentTitle: String = ""
 
-    var speed: Float = 1.3 {
+    var speed: Float = 1.0 {
         didSet {
             audioPlayer.setRate(speed)
             avPlayer?.rate = speed
