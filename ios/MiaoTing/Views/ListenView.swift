@@ -18,6 +18,7 @@ struct ListenView: View {
                 inputCard
                 controlRow
                 speedCard
+                volumeCard
                 disclaimer
                 supportEntry
             }
@@ -235,6 +236,27 @@ struct ListenView: View {
                     .buttonStyle(.plain)
                 }
             }
+        }
+        .padding(12)
+        .background(Color(red: 14 / 255, green: 16 / 255, blue: 21 / 255),
+                    in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    // MARK: - 音量
+
+    private var volumeCard: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text("音量")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(Theme.textPrimary)
+                Spacer()
+                Text("系统媒体音量")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            SystemVolumeSlider()
+                .frame(height: 32)
         }
         .padding(12)
         .background(Color(red: 14 / 255, green: 16 / 255, blue: 21 / 255),
