@@ -52,7 +52,6 @@ final class AppState: ObservableObject {
     @Published private(set) var statusText: String = "未播放"
     @Published private(set) var isPlaying = false
     @Published var speed: Float = 1.0
-    @Published var gain: Float = 2.2
     @Published var preservesPitch = true
 
     // 反馈
@@ -387,7 +386,6 @@ final class AppState: ObservableObject {
         roomTitle = title
         platformName = platform
         playback.speed = speed
-        playback.gain = gain
         playback.preservesPitch = preservesPitch
         playback.play(url: streamURL, title: title)
         statusText = "正在连接直播音频 \(String(format: "%.1f", speed))x"
@@ -403,11 +401,6 @@ final class AppState: ObservableObject {
 
     func togglePlay() {
         if isPlaying { stop() } else { resolveAndPlay() }
-    }
-
-    func setGain(_ value: Float) {
-        gain = value
-        playback.gain = value
     }
 
     func setSpeed(_ value: Float) {
