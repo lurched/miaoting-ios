@@ -40,21 +40,15 @@ final class PlaybackController {
 
     var speed: Float = 1.0 {
         didSet {
-            player.speed = speed
+            audioPlayer.setRate(speed)
             avPlayer?.rate = speed
         }
     }
-    /// 增益，界面上可调
-    var gain: Float = 2.2 {
-        didSet { player.gain = gain }
-    }
-    var preservesPitch: Bool = true {
-        didSet { player.preservesPitch = preservesPitch }
-    }
+    /// AudioQueue 的变速是变调的，和 Android 一致；保留接口只为兼容。
+    var preservesPitch: Bool = true
 
     private let demuxer = FLVDemuxer()
-    private let decoder = AACDecoder()
-    private let player = LiveAudioPlayer()
+    private let audioPlayer = FLVAudioQueuePlayer()
     private var loader: FLVStreamLoader?
     private var avPlayer: AVPlayer?
     private var itemStatusObservation: NSKeyValueObservation?
@@ -67,27 +61,15 @@ final class PlaybackController {
 
     private(set) var configCalls = 0
     private(set) var packetCalls = 0
-    private(set) var decodedFrames = 0
-    private(set) var decodeFails = 0
 
     var diagnosticsLine: String {
         let d = demuxer
-        return "bytes=\(bytesReceived) tags=\(d.tagsSeen) aac=\(d.aacTagsSeen) cfg=\(configCalls) pkt=\(packetCalls) dec=\(decodedFrames) fail=\(decodeFails) eng=\(player.engineRunning ? "on" : "off")"
+        return "bytes=\(bytesReceived) tags=\(d.tagsSeen) aac=\(d.aacTagsSeen) cfg=\(configCalls) pkt=\(packetCalls) queued=\(audioPlayer.enqueued) fail=\(audioPlayer.enqueueFailures) playing=\(audioPlayer.started ? "on" : "off")"
     }
 
     private init() {
-        player.onStateChange = { [weak self] state in
-            guard let self else { return }
-            switch state {
-            case .playing:
-                if self.status != .playing { self.status = .playing }
-            case .failed(let message):
-                self.status = .failed(message)
-            case .buffering:
-                if self.status == .idle || self.status == .preparing { self.status = .preparing }
-            case .idle:
-                break
-            }
+        audioPlayer.onError = { [weak self] message in
+            self?.status = .failed(message)
         }
         configureDemuxer()
     }
@@ -96,26 +78,18 @@ final class PlaybackController {
         demuxer.onConfig = { [weak self] config in
             guard let self else { return }
             self.configCalls += 1
-            guard self.decoder.configure(config) else {
-                self.status = .failed("音频参数不支持：\(config.sampleRate)Hz/\(config.channels)ch")
-                return
-            }
-            self.player.speed = self.speed
-            self.player.preservesPitch = self.preservesPitch
-            self.player.gain = self.gain
-            self.player.start()
+            guard self.audioPlayer.configure(asc: config.asc,
+                                             sampleRate: Double(config.sampleRate),
+                                             channels: UInt32(config.channels)) else { return }
+            self.audioPlayer.setRate(self.speed)
             self.cancelWatchdog()
+            self.status = .playing
         }
 
         demuxer.onPacket = { [weak self] packet, _ in
             guard let self else { return }
             self.packetCalls += 1
-            if let buffer = self.decoder.decode(packet: packet) {
-                self.decodedFrames += 1
-                self.player.enqueue(buffer)
-            } else {
-                self.decodeFails += 1
-            }
+            self.audioPlayer.enqueue(packet)
         }
 
         demuxer.onInvalidStream = { [weak self] in
@@ -156,7 +130,7 @@ final class PlaybackController {
         loader?.cancel()
         loader = nil
         demuxer.reset()
-        player.stop()
+        audioPlayer.stop()
         teardownAVPlayer()
         // 保留 currentURL：锁屏 / 界面上的“继续播放”要靠它重连
         status = .idle
