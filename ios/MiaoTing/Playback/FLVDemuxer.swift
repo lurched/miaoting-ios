@@ -33,6 +33,11 @@ final class FLVDemuxer {
 
     private(set) var config: AACConfig?
     private(set) var packetsReceived = 0
+    /// 诊断计数器
+    private(set) var tagsSeen = 0
+    private(set) var audioTagsSeen = 0
+    private(set) var aacTagsSeen = 0
+    private(set) var configsSeen = 0
 
     func reset() {
         buf.removeAll(keepingCapacity: true)
@@ -40,6 +45,10 @@ final class FLVDemuxer {
         headerParsed = false
         config = nil
         packetsReceived = 0
+        tagsSeen = 0
+        audioTagsSeen = 0
+        aacTagsSeen = 0
+        configsSeen = 0
     }
 
     func append(_ data: Data) {
@@ -85,16 +94,20 @@ final class FLVDemuxer {
             let total = 11 + dataSize + 4
             guard dataSize >= 2, available >= total else { break }
 
+            tagsSeen += 1
             if tagType == 8 {
+                audioTagsSeen += 1
                 let p = offset + 11
                 let soundFormat = (buf[p] >> 4) & 0x0F
                 if soundFormat == 10 {                       // AAC
+                    aacTagsSeen += 1
                     let aacPacketType = buf[p + 1]
                     if aacPacketType == 0, dataSize > 2 {
                         let start = p + 2
                         let asc = Data(buf[start..<(p + dataSize)])
                         if let cfg = Self.parseASC(asc) {
                             config = cfg
+                            configsSeen += 1
                             onConfig?(cfg)
                         }
                     } else if aacPacketType == 1, dataSize > 2 {
