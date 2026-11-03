@@ -102,8 +102,6 @@ enum LocalResolver {
         }
         for raw in urls {
             let lower = raw.lowercased()
-            // thirdgame 是直播间里挂的小游戏推广流，不是主播的声音，直接排除
-            if lower.contains("/thirdgame/") { continue }
             if strict && !(lower.contains("pull-flv") || lower.contains("pull-hls") || lower.contains(".flv") || lower.contains(".m3u8")) {
                 continue
             }
