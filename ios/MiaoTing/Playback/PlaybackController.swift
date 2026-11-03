@@ -223,6 +223,11 @@ final class PlaybackController {
     }
 
     /// 12 秒内没收到任何音频帧就判超时，避免界面永远停在「正在连接」。
+    func playTestTone() {
+        configureAudioSession()
+        player.playTestTone()
+    }
+
     private func startWatchdog(seconds: TimeInterval = 12) {
         watchdog?.cancel()
         let item = DispatchWorkItem { [weak self] in
