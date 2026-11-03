@@ -65,6 +65,7 @@ final class AppState: ObservableObject {
     private let api = APIClient.shared
     private let playback = PlaybackController.shared
     private var pollTask: Task<Void, Never>?
+    private var diagnosticsTimer: Timer?
 
     init() {
         playback.onStatus = { [weak self] status in
@@ -79,6 +80,9 @@ final class AppState: ObservableObject {
             Task { @MainActor in self?.roomTitle = title }
         }
         restore()
+        diagnosticsTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.refreshDiagnostics() }
+        }
     }
 
     // MARK: - 启动
@@ -408,7 +412,11 @@ final class AppState: ObservableObject {
 
     /// 当前实际播放/尝试连接的地址，贴在诊断面板里。
     var activeStreamURL: String { playback.activeStreamURL }
-    var diagnosticsLine: String { playback.diagnosticsLine }
+    @Published private(set) var diagnosticsLine: String = ""
+
+    func refreshDiagnostics() {
+        diagnosticsLine = playback.diagnosticsLine
+    }
 
     // MARK: - 其它
 
