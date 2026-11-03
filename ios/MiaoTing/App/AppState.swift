@@ -408,6 +408,7 @@ final class AppState: ObservableObject {
 
     /// 当前实际播放/尝试连接的地址，贴在诊断面板里。
     var activeStreamURL: String { playback.activeStreamURL }
+    var diagnosticsLine: String { playback.diagnosticsLine }
 
     // MARK: - 其它
 
