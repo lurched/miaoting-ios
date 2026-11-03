@@ -17,6 +17,7 @@
 		5E869F4035398F95C2CEF1D7 /* MiaoTingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20543F0383AE67D70857DD5 /* MiaoTingApp.swift */; };
 		02EAA2D19182F6AC835B7CD5 /* AACDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC6A95A91B92906580F0E3FF /* AACDecoder.swift */; };
 		1F4F7D3073E56EB1116466BA /* BackgroundAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76472B5714BE847D731D9DFF /* BackgroundAudio.swift */; };
+		5562E9C7CC5157ADED2BAECB /* FLVAudioQueuePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D2442165E22E056E2F9AFD9 /* FLVAudioQueuePlayer.swift */; };
 		15D0BB2E60818A5E079D22C8 /* FLVDemuxer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF7706DCDB103DF0AD4CEB82 /* FLVDemuxer.swift */; };
 		AB4962BC825A3A0FD573F224 /* FLVStreamLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D5DEA7D49141B81616A6E1 /* FLVStreamLoader.swift */; };
 		933D90CFF41CA14262F81C5F /* LiveAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2642D8D53E9E0EF74FA493D3 /* LiveAudioPlayer.swift */; };
@@ -48,6 +49,7 @@
 		C20543F0383AE67D70857DD5 /* MiaoTingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiaoTingApp.swift; sourceTree = "<group>"; };
 		CC6A95A91B92906580F0E3FF /* AACDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AACDecoder.swift; sourceTree = "<group>"; };
 		76472B5714BE847D731D9DFF /* BackgroundAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundAudio.swift; sourceTree = "<group>"; };
+		2D2442165E22E056E2F9AFD9 /* FLVAudioQueuePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLVAudioQueuePlayer.swift; sourceTree = "<group>"; };
 		EF7706DCDB103DF0AD4CEB82 /* FLVDemuxer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLVDemuxer.swift; sourceTree = "<group>"; };
 		18D5DEA7D49141B81616A6E1 /* FLVStreamLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FLVStreamLoader.swift; sourceTree = "<group>"; };
 		2642D8D53E9E0EF74FA493D3 /* LiveAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveAudioPlayer.swift; sourceTree = "<group>"; };
@@ -124,6 +126,7 @@
 			children = (
 				CC6A95A91B92906580F0E3FF /* AACDecoder.swift */,
 				76472B5714BE847D731D9DFF /* BackgroundAudio.swift */,
+				2D2442165E22E056E2F9AFD9 /* FLVAudioQueuePlayer.swift */,
 				EF7706DCDB103DF0AD4CEB82 /* FLVDemuxer.swift */,
 				18D5DEA7D49141B81616A6E1 /* FLVStreamLoader.swift */,
 				2642D8D53E9E0EF74FA493D3 /* LiveAudioPlayer.swift */,
@@ -243,6 +246,7 @@
 				5E869F4035398F95C2CEF1D7 /* MiaoTingApp.swift in Sources */,
 				02EAA2D19182F6AC835B7CD5 /* AACDecoder.swift in Sources */,
 				1F4F7D3073E56EB1116466BA /* BackgroundAudio.swift in Sources */,
+				5562E9C7CC5157ADED2BAECB /* FLVAudioQueuePlayer.swift in Sources */,
 				15D0BB2E60818A5E079D22C8 /* FLVDemuxer.swift in Sources */,
 				AB4962BC825A3A0FD573F224 /* FLVStreamLoader.swift in Sources */,
 				933D90CFF41CA14262F81C5F /* LiveAudioPlayer.swift in Sources */,
