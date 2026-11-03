@@ -91,6 +91,7 @@ struct ListenView: View {
                         .background(Theme.surfaceHigh, in: Capsule())
                     }
                     .buttonStyle(.plain)
+                    .disabled(state.isBusy)
                 }
             }
             .padding(.horizontal, 12)
