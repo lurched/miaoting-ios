@@ -51,7 +51,7 @@ final class AppState: ObservableObject {
     @Published private(set) var platformName: String = ""
     @Published private(set) var statusText: String = "未播放"
     @Published private(set) var isPlaying = false
-    @Published var speed: Float = 1.3
+    @Published var speed: Float = 1.0
     @Published var preservesPitch = true
 
     // 反馈
