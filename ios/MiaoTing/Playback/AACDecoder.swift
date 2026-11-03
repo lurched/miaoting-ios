@@ -93,8 +93,8 @@ final class AACDecoder {
         feed.consumed = false
         feed.packetDescription = AudioStreamPacketDescription(
             mStartOffset: 0,
-            mDataByteSize: UInt32(packet.count),
-            mVariableFramesInPacket: 0
+            mVariableFramesInPacket: 0,
+            mDataByteSize: UInt32(packet.count)
         )
         feed.descPointer.pointee = feed.packetDescription
 
