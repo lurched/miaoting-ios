@@ -13,13 +13,18 @@ final class BackgroundAudio {
     }
 
     func activate() {
-        let session = AVAudioSession.sharedInstance()
-        do {
-            try session.setCategory(.playback, mode: .spokenAudio, options: [.allowBluetooth, .allowAirPlay])
-            try session.setActive(true, options: [])
-            activated = true
-        } catch {
-            // 静默失败：某些模拟器环境无法激活音频会话
+        // setActive 会和系统音频服务通信，偶尔要几百毫秒；
+        // 放在主线程会把界面卡住，这里丢到后台。
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let session = AVAudioSession.sharedInstance()
+            do {
+                try session.setCategory(.playback, mode: .default,
+                                        options: [.allowBluetooth, .allowAirPlay])
+                try session.setActive(true, options: [])
+                self?.activated = true
+            } catch {
+                // 模拟器或音频服务异常时静默失败
+            }
         }
     }
 
@@ -30,14 +35,20 @@ final class BackgroundAudio {
     }
 
     func updateNowPlaying(title: String, playing: Bool) {
-        var info: [String: Any] = [
-            MPMediaItemPropertyTitle: title.isEmpty ? "秒听" : title,
-            MPMediaItemPropertyArtist: "秒听 · 直播抢货伴侣",
-            MPNowPlayingInfoPropertyPlaybackRate: playing ? PlaybackController.shared.speed : 0,
-            MPNowPlayingInfoPropertyIsLiveStream: true
-        ]
-        info[MPMediaItemPropertyAlbumTitle] = "直播音频"
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+        let speed = PlaybackController.shared.speed
+        // MPNowPlayingInfoCenter 的 setter 要走系统媒体服务，
+        // 网络/锁屏状态异常时会阻塞主线程，放到后台。
+        DispatchQueue.global(qos: .utility).async {
+            var info: [String: Any] = [
+                MPMediaItemPropertyTitle: title.isEmpty ? "秒听" : title,
+                MPMediaItemPropertyArtist: "秒听 · 直播抢货伴侣",
+                MPNowPlayingInfoPropertyPlaybackRate: playing ? speed : 0,
+                MPNowPlayingInfoPropertyIsLiveStream: true,
+                MPMediaItemPropertyAlbumTitle: "直播音频"
+            ]
+            info[MPMediaItemPropertyAlbumTitle] = "直播音频"
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+        }
     }
 
     private func registerRemoteCommands() {
