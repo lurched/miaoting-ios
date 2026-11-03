@@ -40,6 +40,9 @@ final class LiveAudioPlayer {
     var preservesPitch = true {
         didSet { applySpeed() }
     }
+    /// 线性增益。抖音那条 only_audio 流的电平偏低，直接播比原声小很多，
+    /// 这里在喂给播放节点之前乘一个系数（AudioQueue 那条路做不到，所以换回 AVAudioEngine）。
+    var gain: Float = 2.2
     /// 允许的最大积压，超过就丢弃已排队缓冲去追直播（Android 端是 pause/flush/play）。
     /// 原版阈值是 0.35s + 250ms 冷却；移动网络下 0.35s 容易反复重排，这里放宽到 0.9s。
     var maxLatency: Double = 0.9
@@ -104,6 +107,7 @@ final class LiveAudioPlayer {
     // MARK: - 数据
 
     func enqueue(_ buffer: AVAudioPCMBuffer) {
+        applyGain(buffer)
         queue.async { [weak self] in
             guard let self, self.isRunning else { return }
             self.sampleRate = buffer.format.sampleRate
@@ -162,6 +166,20 @@ final class LiveAudioPlayer {
             self.player.scheduleBuffer(buffer, at: nil, options: [], completionHandler: nil)
             self.player.play()
             self.state = .playing
+        }
+    }
+
+    private func applyGain(_ buffer: AVAudioPCMBuffer) {
+        guard gain != 1.0, let data = buffer.floatChannelData else { return }
+        let channels = Int(buffer.format.channelCount)
+        let frames = Int(buffer.frameLength)
+        guard channels > 0, frames > 0 else { return }
+        for c in 0..<channels {
+            let pointer = data[c]
+            for i in 0..<frames {
+                let value = pointer[i] * gain
+                pointer[i] = max(-1.0, min(1.0, value))
+            }
         }
     }
 
