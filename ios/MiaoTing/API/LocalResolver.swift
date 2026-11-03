@@ -24,13 +24,14 @@ enum LocalResolver {
         for url in candidatePageURLs(pageURL) {
             var loaded: (html: String, finalURL: String)?
 
-            // 抖音短链必须走浏览器：302 目标依赖 JS 写入的 Cookie。
-            if LinkExtractor.host(of: url) == "v.douyin.com", let target = URL(string: url) {
+            // 先走普通 HTTP —— 短链正常情况下会直接 302 到 reflow 页。
+            loaded = await fetch(url)
+
+            // 拿不到候选时，再退到隐藏的 WKWebView 兜底（执行 JS 才能过的场景）。
+            if loaded == nil, LinkExtractor.host(of: url) == "v.douyin.com", let target = URL(string: url) {
                 if let page = await WebPageLoader.shared.load(target) {
                     loaded = (page.html, page.finalURL?.absoluteString ?? url)
                 }
-            } else {
-                loaded = await fetch(url)
             }
 
             guard let page = loaded else { continue }
