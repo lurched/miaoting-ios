@@ -230,14 +230,24 @@ struct AccountView: View {
     }
 
     private var streamCard: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("当前播放地址")
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("当前播放地址")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Theme.textSecondary)
+                Spacer()
+                Button("复制") {
+                    UIPasteboard.general.string = state.activeStreamURL
+                    state.toast = "已复制播放地址"
+                }
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Theme.textSecondary)
+                .foregroundStyle(Theme.accent)
+            }
             Text(state.activeStreamURL)
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundStyle(Theme.accent)
-                .lineLimit(6)
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
@@ -250,14 +260,16 @@ struct AccountView: View {
             Text("\(trace.method) \(trace.path)")
                 .font(.system(size: 11, weight: .semibold, design: .monospaced))
                 .foregroundStyle(Theme.accent)
-                .lineLimit(2)
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
             Text("HTTP \(trace.status)")
                 .font(.system(size: 11, design: .monospaced))
                 .foregroundStyle(trace.status == 200 ? Theme.textSecondary : Theme.danger)
             Text(trace.body)
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundStyle(Theme.textSecondary)
-                .lineLimit(8)
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
